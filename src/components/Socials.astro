@@ -1,0 +1,69 @@
+---
+import instagram from "../icons/instagram.svg?raw";
+import facebook from "../icons/facebook.svg?raw";
+import whatsapp from "../icons/whatsapp.svg?raw";
+import telegram from "../icons/telegram.svg?raw";
+import { socials } from "../data/site";
+
+/** Официальные монохромные глифы (Simple Icons) — без брендовых градиентов. */
+const icons: Record<string, string> = { instagram, facebook, whatsapp, telegram };
+---
+
+<ul class="socials">
+  {
+    socials.map((s) => (
+      <li>
+        <a
+          href={s.href}
+          class="soc"
+          aria-label={s.name}
+          rel="noopener noreferrer"
+          target={s.href === "#" ? undefined : "_blank"}
+          set:html={icons[s.icon]}
+        />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .socials {
+    display: flex;
+    gap: 1px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--color-line-soft);
+    border: 1px solid var(--color-line-soft);
+    width: fit-content;
+  }
+
+  .soc {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    background: var(--color-ink-950);
+    color: var(--color-fg-faint);
+    transition:
+      background 200ms var(--ease-out-expo),
+      color 200ms var(--ease-out-expo);
+  }
+  .soc:hover {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  .soc :global(svg) {
+    width: 17px;
+    height: 17px;
+    display: block;
+  }
+  /* Simple Icons приходят без fill — красим текущим цветом */
+  .soc :global(svg path) {
+    fill: currentColor;
+  }
+  .soc :global(svg title) {
+    display: none;
+  }
+</style>

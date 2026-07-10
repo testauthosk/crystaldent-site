@@ -1,5 +1,6 @@
 ---
 import Logo from "./Logo.astro";
+import Socials from "./Socials.astro";
 import { brand, nav, services, PLACEHOLDER } from "../data/site";
 
 /** Пустые контакты не рендерим — прочерки на витрине выглядят как брак. */
@@ -27,6 +28,7 @@ const has = (v: string) => v && v !== PLACEHOLDER;
       <div class="f-col f-brand">
         <Logo variant="lockup" />
         <p class="f-tag">{brand.tagline}</p>
+        <Socials />
       </div>
 
       <nav class="f-col" aria-label="Разделы">

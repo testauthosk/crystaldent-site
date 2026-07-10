@@ -19,6 +19,14 @@ export const brand = {
   hours: PLACEHOLDER,
 };
 
+/** TODO: реальные ссылки на аккаунты клиники. Пока — заглушки. */
+export const socials = [
+  { name: "Instagram", href: "#", icon: "instagram" },
+  { name: "Facebook", href: "#", icon: "facebook" },
+  { name: "WhatsApp", href: "#", icon: "whatsapp" },
+  { name: "Telegram", href: "#", icon: "telegram" },
+];
+
 export const nav = [
   { label: "Услуги", href: "#services" },
   { label: "Врачи", href: "#doctors" },

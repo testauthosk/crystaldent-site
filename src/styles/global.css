@@ -69,9 +69,15 @@
 html {
   /* скроллом управляет Lenis */
   scroll-behavior: auto;
+  /* без этого страницу можно оттянуть за край и увидеть пустоту под ней */
+  overscroll-behavior: none;
+  /* тот же цвет, что у подвала: если резина всё же сработает, за краем
+     будет фон сайта, а не белизна браузера */
+  background: var(--color-ink-950);
 }
 
 body {
+  overscroll-behavior: none;
   background: var(--color-ink-900);
   color: var(--color-fg);
   font-family: var(--font-sans);

@@ -401,7 +401,7 @@ function initWordmarkGlow() {
     return;
   }
 
-  gsap.fromTo(
+  const tween = gsap.fromTo(
     lit,
     { clipPath: "inset(0 100% 0 0)" },
     {
@@ -415,10 +415,27 @@ function initWordmarkGlow() {
         endTrigger: document.body,
         end: "bottom bottom",
         scrub: 0.5,
+        invalidateOnRefresh: true,
         onUpdate: (self) => wrap.classList.toggle("is-lit", self.progress > 0.98),
       },
     },
   );
+
+  // На мобильных высота вьюпорта скачет из-за адресной строки, поэтому scrub
+  // может не дотянуть до 100% даже в самом низу. Дожигаем вручную по факту
+  // достижения дна — иначе надпись остаётся наполовину белой.
+  const atBottom = () =>
+    window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+
+  const check = () => {
+    if (!atBottom()) return;
+    tween.scrollTrigger?.refresh();
+    gsap.to(lit, { clipPath: "inset(0 0% 0 0)", duration: 0.35, ease: "power2.out", overwrite: "auto" });
+    wrap.classList.add("is-lit");
+  };
+
+  window.addEventListener("scroll", check, { passive: true });
+  window.addEventListener("resize", () => ScrollTrigger.refresh());
 }
 
 /* ── Прогресс-полоса чтения ─────────────────────────────── */
