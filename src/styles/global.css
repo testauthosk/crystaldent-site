@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* Вариативные шрифты, самохост (кириллица включена) */
+/* Вариативные шрифты, самохост (кириллица родная, не «дорисованная») */
 @import "@fontsource-variable/unbounded";
-@import "@fontsource-variable/jost";
+@import "@fontsource-variable/onest";
 
 /* ─────────────────────────────────────────────────────────────
    ДИЗАЙН-ТОКЕНЫ — CrystalDent
@@ -13,7 +13,7 @@
    ───────────────────────────────────────────────────────────── */
 @theme {
   --font-display: "Unbounded Variable", "Unbounded", system-ui, sans-serif;
-  --font-sans: "Jost Variable", "Jost", system-ui, sans-serif;
+  --font-sans: "Onest Variable", "Onest", system-ui, sans-serif;
 
   --color-ink-950: oklch(0.11 0.015 220);
   --color-ink-900: oklch(0.152 0.018 218);
@@ -43,16 +43,21 @@
   /* Модульная шкала — Perfect Fourth 1.333 */
   --text-2xs: 0.6875rem;
   --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.3125rem;
-  --text-xl: 1.75rem;
-  --text-2xl: 2.3125rem;
-  --text-3xl: 3.0625rem;
-  --text-4xl: 4.0625rem;
-  --text-5xl: 5.4375rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.5rem;
+  --text-xl: 2rem;
+  --text-2xl: 2.6875rem;
+  --text-3xl: 3.5625rem;
+  --text-4xl: 4.75rem;
+  --text-5xl: 6.3125rem;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Секционный ритм: воздуха вдвое больше, чем кажется достаточным */
+  --sec-y: clamp(5rem, 11vw, 11rem);
+  --gutter: clamp(1.25rem, 3vw, 3rem);
+  --maxw: 1680px;
 }
 
 /* ── База ─────────────────────────────────────────────────── */
@@ -71,7 +76,9 @@ body {
   color: var(--color-fg);
   font-family: var(--font-sans);
   font-size: var(--text-base);
-  line-height: 1.6;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.003em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
@@ -101,23 +108,52 @@ time,
   font-family: var(--font-display);
   font-weight: 700;
   text-transform: uppercase;
-  line-height: 0.95;
-  letter-spacing: 0.01em;
+  /* Unbounded и без того широкий: плотный интерлиньяж и нулевой трекинг
+     собирают заголовок в плиту, иначе он рассыпается и выглядит дёшево */
+  line-height: 0.9;
+  letter-spacing: -0.006em;
+}
+
+/* Крупный заголовок секции — один размер на весь сайт, без самодеятельности */
+.sec-title {
+  font-size: clamp(2.35rem, 5.6vw, 5.4rem);
+  margin: 0;
 }
 
 .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
   font-size: var(--text-2xs);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   color: var(--color-fg-faint);
+}
+/* засечка-квадрат перед надглавием — рифма со знаком логотипа */
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent);
+  flex: none;
 }
 
 .lede {
   font-size: var(--text-base);
-  line-height: 1.65;
+  line-height: 1.6;
   color: var(--color-fg-dim);
-  max-width: 46ch;
+  max-width: 44ch;
+}
+
+/* Индекс секции — мелкая метка справа, задаёт ритм и «редакторский» вид */
+.sec-index {
+  font-family: var(--font-display);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-fg-faint);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Grain: снимает «антисептик» с плоских заливок ────────── */
@@ -260,6 +296,28 @@ time,
 }
 .line-inner {
   display: block;
+  will-change: transform;
+}
+
+/* То же для строк, нарезанных SplitType */
+.s-line {
+  display: block;
+  overflow: hidden;
+  /* запас под свисающие элементы, иначе маска срежет «у», «р», «ц» */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.s-inner {
+  display: block;
+  will-change: transform;
+}
+
+/* Контейнер картинки, раскрывающейся маской */
+[data-img-reveal] {
+  overflow: hidden;
+  will-change: clip-path;
+}
+[data-img-reveal] img {
   will-change: transform;
 }
 

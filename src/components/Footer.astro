@@ -1,70 +1,63 @@
 ---
 import Logo from "./Logo.astro";
-import { brand, nav, PLACEHOLDER } from "../data/site";
+import { brand, nav, services, PLACEHOLDER } from "../data/site";
 
 /** Пустые контакты не рендерим — прочерки на витрине выглядят как брак. */
 const has = (v: string) => v && v !== PLACEHOLDER;
-const showContacts = has(brand.phone) || has(brand.email);
-const showAddress = has(brand.address) || has(brand.hours);
 ---
 
+<!-- ── Большая CTA-строка вместо дежурного блока ── -->
 <section class="cta" id="contacts">
-  <div class="aura" aria-hidden="true"></div>
-  <div class="wrap cta-wrap">
-    <h2 class="display cta-title reveal">
-      <span class="line-mask"><span class="line-inner">Готовы начать</span></span>
-      <span class="line-mask"><span class="line-inner">лечение?</span></span>
-    </h2>
-    <div class="cta-side reveal">
-      <p class="lede">
-        Запишитесь на консультацию — врач осмотрит, объяснит варианты и составит план без
-        обязательств.
-      </p>
-      <a href="#booking" class="btn btn--paper" data-magnetic>
-        <span class="btn__label">Записаться на приём</span>
-      </a>
+  <a href="#booking" class="cta-link" aria-label="Записаться на приём">
+    <div class="wrap cta-wrap">
+      <span class="eyebrow">Запись</span>
+      <h2 class="display cta-title" data-split>Готовы начать лечение?</h2>
+      <span class="cta-mark" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" stroke-width="1.2"></path>
+        </svg>
+      </span>
     </div>
-  </div>
+  </a>
 </section>
 
 <footer class="footer">
   <div class="wrap">
-    <div class="f-grid">
-      <div class="f-brand">
+    <div class="f-top">
+      <div class="f-col f-brand">
         <Logo variant="lockup" />
         <p class="f-tag">{brand.tagline}</p>
       </div>
 
-      <nav class="f-nav" aria-label="Подвал">
-        <span class="eyebrow">Разделы</span>
-        {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      <nav class="f-col" aria-label="Разделы">
+        <span class="f-h">Разделы</span>
+        {nav.map((n) => <a href={n.href} class="f-link">{n.label}</a>)}
       </nav>
 
-      {
-        showContacts && (
-          <div class="f-col">
-            <span class="eyebrow">Контакты</span>
-            {has(brand.phone) && <span class="f-val tnum">{brand.phone}</span>}
-            {has(brand.email) && <span class="f-val">{brand.email}</span>}
-          </div>
-        )
-      }
-
-      {
-        showAddress && (
-          <div class="f-col">
-            <span class="eyebrow">Адрес</span>
-            {has(brand.address) && <span class="f-val">{brand.address}</span>}
-            {has(brand.hours) && <span class="f-val tnum">{brand.hours}</span>}
-          </div>
-        )
-      }
+      <nav class="f-col" aria-label="Услуги">
+        <span class="f-h">Услуги</span>
+        {services.slice(0, 5).map((s) => <a href="#services" class="f-link">{s.title}</a>)}
+      </nav>
 
       <div class="f-col">
-        <span class="eyebrow">Запись</span>
-        <a href="#booking" class="f-val f-link">Онлайн-запись</a>
-        <a href="#faq" class="f-val f-link">Частые вопросы</a>
+        <span class="f-h">Контакты</span>
+        {has(brand.phone) && <a href={`tel:${brand.phone}`} class="f-link tnum">{brand.phone}</a>}
+        {has(brand.email) && <a href={`mailto:${brand.email}`} class="f-link">{brand.email}</a>}
+        {has(brand.address) && <span class="f-val">{brand.address}</span>}
+        {has(brand.hours) && <span class="f-val tnum">{brand.hours}</span>}
+        {!has(brand.phone) && !has(brand.address) && (
+          <>
+            <a href="#booking" class="f-link">Онлайн-запись</a>
+            <a href="#faq" class="f-link">Частые вопросы</a>
+            <a href="#doctors" class="f-link">Выбрать врача</a>
+          </>
+        )}
       </div>
+    </div>
+
+    <!-- Гигантский знак: подпись клиники во всю ширину подвала -->
+    <div class="f-wordmark" aria-hidden="true">
+      <Logo variant="wordmark" class="f-word" />
     </div>
 
     <div class="f-bottom">
@@ -76,52 +69,97 @@ const showAddress = has(brand.address) || has(brand.hours);
 
 <style>
   .wrap {
-    max-width: 1600px;
+    max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    padding: 0 var(--gutter);
   }
 
+  /* ── CTA ── */
   .cta {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(4rem, 9vw, 8rem) 0;
-    background: var(--color-ink-900);
     border-top: 1px solid var(--color-line-soft);
+    background: var(--color-ink-900);
   }
+  .cta-link {
+    display: block;
+    position: relative;
+    padding: clamp(3.5rem, 8vw, 8rem) 0;
+    color: var(--color-fg);
+    overflow: hidden;
+  }
+  /* заливка приходит снизу — реагирует вся полоса, а не кнопка */
+  .cta-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-accent);
+    transform: translateY(101%);
+    transition: transform 620ms var(--ease-out-expo);
+  }
+  .cta-link:hover::before {
+    transform: translateY(0);
+  }
+  .cta-link:hover {
+    color: var(--color-accent-ink);
+  }
+  .cta-link:hover .eyebrow {
+    color: color-mix(in oklch, var(--color-accent-ink) 70%, transparent);
+  }
+  .cta-link:hover .eyebrow::before {
+    background: var(--color-accent-ink);
+  }
+
   .cta-wrap {
     position: relative;
-    z-index: 1;
     display: grid;
-    gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: 1fr auto;
     align-items: end;
+    gap: 1.5rem;
+  }
+  .cta-wrap .eyebrow {
+    grid-column: 1 / -1;
+    margin-bottom: 1.25rem;
   }
   .cta-title {
-    font-size: clamp(2rem, 6vw, 5.4rem);
+    font-size: clamp(2.2rem, 7vw, 7rem);
     margin: 0;
   }
-  .cta-side {
+  .cta-mark {
     display: grid;
-    gap: 1.75rem;
-    justify-items: start;
+    place-items: center;
+    width: clamp(48px, 5vw, 84px);
+    aspect-ratio: 1;
+    border: 1px solid currentColor;
+    flex: none;
+  }
+  .cta-mark svg {
+    width: 42%;
+    height: 42%;
+    transition: transform 420ms var(--ease-out-expo);
+  }
+  .cta-link:hover .cta-mark svg {
+    transform: translate(3px, -3px);
   }
 
+  /* ── Подвал ── */
   .footer {
     background: var(--color-ink-950);
     border-top: 1px solid var(--color-line-soft);
-    padding: clamp(2.5rem, 5vw, 4rem) 0 2rem;
+    padding: clamp(3rem, 6vw, 5rem) 0 1.75rem;
   }
 
-  .f-grid {
+  .f-top {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-    padding-bottom: 2.5rem;
-    border-bottom: 1px solid var(--color-line-soft);
+    gap: 2.75rem;
   }
 
-  .f-brand {
+  .f-col {
     display: grid;
-    gap: 1rem;
+    gap: 0.85rem;
+    align-content: start;
+  }
+  .f-brand {
+    gap: 1.1rem;
     justify-items: start;
     color: var(--color-fg);
   }
@@ -133,31 +171,59 @@ const showAddress = has(brand.address) || has(brand.hours);
     color: var(--color-fg-faint);
   }
 
-  .f-nav,
-  .f-col {
-    display: grid;
-    gap: 0.75rem;
-    align-content: start;
+  .f-h {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-fg-faint);
+    margin-bottom: 0.35rem;
   }
-  .f-nav a {
-    font-size: var(--text-sm);
-    color: var(--color-fg-dim);
-    transition: color 160ms var(--ease-out-expo);
-    width: fit-content;
-  }
-  .f-nav a:hover {
-    color: var(--color-accent);
-  }
+
+  .f-link,
   .f-val {
     font-size: var(--text-sm);
     color: var(--color-fg-dim);
+    width: fit-content;
   }
   .f-link {
-    width: fit-content;
-    transition: color 160ms var(--ease-out-expo);
+    position: relative;
+    transition: color 180ms var(--ease-out-expo);
+  }
+  .f-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 320ms var(--ease-out-expo);
   }
   .f-link:hover {
-    color: var(--color-accent);
+    color: var(--color-fg);
+  }
+  .f-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  /* знак во всю ширину — подпись клиники, а не декор */
+  .f-wordmark {
+    margin: clamp(3rem, 7vw, 6rem) 0 clamp(1.5rem, 3vw, 2.5rem);
+    color: var(--color-ink-700);
+    line-height: 0;
+  }
+  /* перебиваем фиксированную высоту из Logo.astro */
+  .f-wordmark :global(.logo-word) {
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+  .f-wordmark :global(.logo-word svg) {
+    width: 100%;
+    height: auto;
   }
 
   .f-bottom {
@@ -166,17 +232,21 @@ const showAddress = has(brand.address) || has(brand.hours);
     justify-content: space-between;
     gap: 1rem;
     padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line-soft);
     font-size: var(--text-2xs);
     letter-spacing: 0.06em;
     color: var(--color-fg-faint);
   }
 
-  @media (min-width: 900px) {
-    .cta-wrap {
-      grid-template-columns: 1.3fr 0.7fr;
+  @media (min-width: 720px) {
+    .f-top {
+      grid-template-columns: repeat(2, 1fr);
     }
-    .f-grid {
-      grid-template-columns: 1.6fr 1fr 1fr;
+  }
+  @media (min-width: 1080px) {
+    .f-top {
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 3rem;
     }
   }
 </style>

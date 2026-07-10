@@ -5,9 +5,9 @@ import { doctors } from "../data/site";
 <section class="sec" id="doctors">
   <div class="wrap">
     <header class="doc-head">
-      <div class="reveal">
-        <span class="eyebrow">Команда</span>
-        <h2 class="display sec-title">Врачи<br />клиники</h2>
+      <div>
+        <span class="eyebrow reveal">Команда</span>
+        <h2 class="display sec-title" data-split>Врачи клиники</h2>
       </div>
       <p class="lede reveal">
         Профиль каждого специалиста, свободные окна в расписании и запись в два клика — без звонков
@@ -19,7 +19,7 @@ import { doctors } from "../data/site";
       {
         doctors.map((d) => (
           <article class="doc group reveal">
-            <div class="doc-photo">
+            <div class="doc-photo" data-img-reveal>
               <img
                 src={d.photo}
                 alt={`${d.role} клиники CrystalDent`}
@@ -60,24 +60,23 @@ import { doctors } from "../data/site";
 
 <style>
   .sec {
-    padding: clamp(4rem, 9vw, 8.5rem) 0;
+    padding: var(--sec-y) 0;
     background: var(--color-ink-950);
-    border-block: 1px solid var(--color-line-soft);
+    border-bottom: 1px solid var(--color-line-soft);
   }
   .wrap {
-    max-width: 1600px;
+    max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    padding: 0 var(--gutter);
   }
 
   .doc-head {
     display: grid;
-    gap: 1.5rem;
-    margin-bottom: clamp(2.5rem, 4vw, 4rem);
+    gap: 1.75rem;
+    margin-bottom: clamp(3rem, 6vw, 5.5rem);
   }
-  .sec-title {
-    font-size: clamp(1.9rem, 4.4vw, 4rem);
-    margin: 0.9rem 0 0;
+  .doc-head .eyebrow {
+    margin-bottom: 1.5rem;
   }
 
   .docs {
@@ -205,7 +204,7 @@ import { doctors } from "../data/site";
       grid-template-columns: repeat(4, 1fr);
     }
     .doc-head {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.35fr 0.65fr;
       align-items: end;
       gap: 4rem;
     }

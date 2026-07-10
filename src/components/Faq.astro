@@ -5,9 +5,9 @@ import { faq } from "../data/site";
 <section class="sec" id="faq">
   <div class="wrap">
     <div class="grid">
-      <header class="reveal">
-        <span class="eyebrow">Вопросы</span>
-        <h2 class="display sec-title">Коротко<br />о главном</h2>
+      <header>
+        <span class="eyebrow reveal">Вопросы</span>
+        <h2 class="display sec-title" data-split>Коротко о главном</h2>
       </header>
 
       <div class="list">
@@ -35,14 +35,13 @@ import { faq } from "../data/site";
 
 <style>
   .sec {
-    padding: clamp(4rem, 9vw, 8.5rem) 0;
+    padding: var(--sec-y) 0;
     background: var(--color-ink-950);
-    border-top: 1px solid var(--color-line-soft);
   }
   .wrap {
-    max-width: 1600px;
+    max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    padding: 0 var(--gutter);
   }
   .grid {
     display: grid;
@@ -50,9 +49,8 @@ import { faq } from "../data/site";
     gap: clamp(2.5rem, 4vw, 5rem);
     align-items: start;
   }
-  .sec-title {
-    font-size: clamp(1.9rem, 4.4vw, 4rem);
-    margin: 0.9rem 0 0;
+  header .eyebrow {
+    margin-bottom: 1.5rem;
   }
 
   .list {

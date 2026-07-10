@@ -9,7 +9,7 @@ import { slots, bookingSteps, services } from "../data/site";
     <div class="grid">
       <header class="b-head">
         <span class="eyebrow reveal">Онлайн-запись</span>
-        <h2 class="display b-title reveal">Два клика<br />до приёма</h2>
+        <h2 class="display sec-title b-title" data-split>Два клика до приёма</h2>
         <p class="lede reveal">
           Выберите услугу, удобный день и время. Администратор подтвердит визит и напомнит о нём
           заранее.
@@ -83,15 +83,15 @@ import { slots, bookingSteps, services } from "../data/site";
 <style>
   .sec {
     position: relative;
-    padding: clamp(4rem, 9vw, 8.5rem) 0;
+    padding: var(--sec-y) 0;
     overflow: hidden;
   }
   .wrap {
     position: relative;
     z-index: 1;
-    max-width: 1600px;
+    max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    padding: 0 var(--gutter);
   }
 
   .grid {
@@ -102,8 +102,7 @@ import { slots, bookingSteps, services } from "../data/site";
   }
 
   .b-title {
-    font-size: clamp(1.9rem, 4.4vw, 4rem);
-    margin: 0.9rem 0 1.5rem;
+    margin: 1.25rem 0 1.75rem;
   }
 
   .steps {

@@ -1,0 +1,68 @@
+---
+/**
+ * Прелоадер: сетка квадратов на весь экран. Волна стартует из четырёх углов
+ * и сходится к центру, плитки переворачиваются в 3D. В центре остаётся знак
+ * логотипа, затем гаснет.
+ *
+ * Плитки строятся в JS (motion.ts) — их число зависит от вьюпорта:
+ * на десктопе квадрат крупный, на мобиле мелкий.
+ */
+---
+
+<div id="preloader" aria-hidden="true">
+  <div id="preTiles" class="tiles"></div>
+  <div id="preMark" class="pre-mark"></div>
+</div>
+
+<style>
+  #preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    /* плитки строит JS — до этого фон держит экран, иначе мелькает hero */
+    background: #080f13;
+  }
+  html:not(.js) #preloader {
+    display: none;
+  }
+
+  .tiles {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    perspective: 1200px;
+    perspective-origin: 50% 50%;
+    transform-style: preserve-3d;
+  }
+
+  .tiles :global(.tile) {
+    background: #080f13;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity, background-color;
+    /* 1px нахлёст убирает волосяные щели между плитками на субпиксельной сетке */
+    outline: 1px solid #080f13;
+  }
+
+  .pre-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(52px, 7vw, 96px);
+    aspect-ratio: 124 / 152;
+    transform: translate(-50%, -50%) scale(0.94);
+    opacity: 0;
+    background: #fff;
+    -webkit-mask: url("/brand/mark.svg") center / contain no-repeat;
+    mask: url("/brand/mark.svg") center / contain no-repeat;
+    /* виден и на тёмных плитках, и на белой плите hero, когда волна уйдёт */
+    mix-blend-mode: difference;
+    will-change: transform, opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #preloader {
+      display: none;
+    }
+  }
+</style>
