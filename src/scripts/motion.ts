@@ -87,9 +87,20 @@ function initFloating() {
     });
   };
 
+  // Пока страница стоит на самом верху, кнопки убраны за нижний край —
+  // первый экран остаётся чистым. Выезжают с первого же пикселя прокрутки.
+  const toggleShown = (show: boolean) => {
+    chat.classList.toggle("is-shown", show);
+    stack.classList.toggle("is-shown", show);
+  };
+
   // Прямой слушатель, а не ScrollTrigger без триггер-элемента: с Lenis такой
   // триггер не всегда переключается на мобильных.
-  const onScroll = () => toggleTop(scrollPos() > viewH() * 0.8);
+  const onScroll = () => {
+    const y = scrollPos();
+    toggleShown(y > 0);
+    toggleTop(y > viewH() * 0.8);
+  };
   scrollTarget.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 

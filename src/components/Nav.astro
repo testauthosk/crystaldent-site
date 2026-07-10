@@ -87,6 +87,9 @@ import { nav } from "../data/site";
     height: var(--nav-h);
     display: flex;
     align-items: center;
+    /* отступ снаружи ограничителя — ровно как у плиты hero, иначе на широких
+       экранах содержимое шапки уезжает внутрь на величину gutter */
+    padding-inline: var(--gutter);
     border-bottom: 1px solid transparent;
     transition:
       background-color 260ms var(--ease-out-expo),
@@ -99,11 +102,12 @@ import { nav } from "../data/site";
     border-bottom-color: var(--color-line-soft);
   }
 
+  /* та же сетка, что у секций: иначе на широких экранах шапка уже контента
+     и логотип не встаёт на одну вертикаль с заголовком */
   .nav-inner {
     width: 100%;
-    max-width: 1600px;
+    max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0 clamp(1rem, 3vw, 2.5rem);
     display: flex;
     align-items: center;
     justify-content: space-between;

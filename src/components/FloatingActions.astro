@@ -101,6 +101,30 @@
     border-bottom: 0;
   }
 
+  /* На самом верху страницы кнопки убраны за нижний край — первый экран
+     остаётся чистым. Выдвигаются с первого же пикселя прокрутки. */
+  .fab-chat,
+  .fab-stack {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 520ms var(--ease-out-expo),
+      opacity 320ms var(--ease-out-expo);
+  }
+  .fab-chat.is-shown,
+  .fab-stack.is-shown {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* при открытом чате кнопка обязана быть на месте, даже если мы вверху */
+  .fab-chat[aria-expanded="true"] {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* две иконки в одной точке: чат уходит поворотом, крестик приходит */
   .ic {
     position: absolute;
