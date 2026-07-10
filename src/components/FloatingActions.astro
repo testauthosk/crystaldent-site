@@ -63,14 +63,17 @@
 
 <style>
   .fab {
+    --fab: 64px;
     position: relative;
     display: grid;
     place-items: center;
-    width: var(--fab, 56px);
-    height: var(--fab, 56px);
+    width: var(--fab);
+    height: var(--fab);
     background: var(--color-ink-950);
-    border: 1px solid var(--color-line);
-    color: var(--color-fg-dim);
+    /* мятная рамка и мятная иконка: на тёмном подвале тусклая серая кнопка
+       просто пропадала */
+    border: 1px solid var(--color-accent-strong);
+    color: var(--color-accent);
     cursor: pointer;
     transition:
       background 260ms var(--ease-out-expo),
@@ -78,8 +81,8 @@
       border-color 260ms var(--ease-out-expo);
   }
   .fab svg {
-    width: 21px;
-    height: 21px;
+    width: 24px;
+    height: 24px;
   }
   .fab:hover {
     background: var(--color-accent);
@@ -169,7 +172,7 @@
       display: none;
     }
     .fab-top {
-      height: 56px;
+      height: 64px;
       opacity: 1;
       pointer-events: auto;
     }
@@ -177,11 +180,11 @@
 
   @media (max-width: 480px) {
     .fab {
-      --fab: 50px;
+      --fab: 58px;
     }
     .fab svg {
-      width: 19px;
-      height: 19px;
+      width: 22px;
+      height: 22px;
     }
   }
 </style>

@@ -231,9 +231,10 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     transform-origin: left center;
   }
 
-  /* знак во всю ширину — подпись клиники, а не декор */
+  /* подпись клиники: крупная, но не во всю ширину — иначе давит подвал */
   .f-wordmark {
     position: relative;
+    width: clamp(240px, 46%, 640px);
     margin: clamp(1.75rem, 3.5vw, 3rem) 0 clamp(1rem, 2vw, 1.5rem);
     line-height: 0;
   }

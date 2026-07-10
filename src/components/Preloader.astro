@@ -31,7 +31,9 @@ import markSvg from "../brand/mark.svg?raw";
     if (!grid) return;
 
     const vw = window.innerWidth;
-    const tile = vw >= 1024 ? 68 : vw >= 640 ? 48 : 32; // на компе крупнее, на мобиле мельче
+    // На десктопе крупные квадраты выглядели грубо — уменьшены примерно на 40%.
+    // На мобиле остаются мелкими.
+    const tile = vw >= 1024 ? 40 : vw >= 640 ? 36 : 32;
     const cols = Math.ceil(vw / tile);
     const rows = Math.ceil(window.innerHeight / tile);
 
@@ -84,7 +86,9 @@ import markSvg from "../brand/mark.svg?raw";
     z-index: 0;
     top: 50%;
     left: 50%;
-    width: clamp(54px, 7vw, 98px);
+    /* на десктопе знак был крупным и смотрелся тяжело — ужат примерно на 40%.
+       на мобиле размер прежний */
+    width: clamp(54px, 4.2vw, 60px);
     aspect-ratio: 124 / 152;
     transform: translate(-50%, -50%);
   }
