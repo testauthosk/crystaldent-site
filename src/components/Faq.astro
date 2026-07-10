@@ -1,0 +1,130 @@
+---
+import { faq } from "../data/site";
+---
+
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="grid">
+      <header class="reveal">
+        <span class="eyebrow">Вопросы</span>
+        <h2 class="display sec-title">Коротко<br />о главном</h2>
+      </header>
+
+      <div class="list">
+        {
+          faq.map((item, i) => (
+            <div class="row reveal">
+              <button type="button" class="q" aria-expanded="false" data-faq-trigger id={`faq-t-${i}`}>
+                <span class="q-n tnum">{String(i + 1).padStart(2, "0")}</span>
+                <span class="q-text">{item.q}</span>
+                <span class="q-icon" aria-hidden="true">
+                  <span />
+                  <span />
+                </span>
+              </button>
+              <div class="faq-panel" role="region" aria-labelledby={`faq-t-${i}`}>
+                <p>{item.a}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding: clamp(4rem, 9vw, 8.5rem) 0;
+    background: var(--color-ink-950);
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .wrap {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 4vw, 5rem);
+    align-items: start;
+  }
+  .sec-title {
+    font-size: clamp(1.9rem, 4.4vw, 4rem);
+    margin: 0.9rem 0 0;
+  }
+
+  .list {
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .row {
+    border-bottom: 1px solid var(--color-line-soft);
+  }
+
+  .q {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.4rem 0;
+    background: none;
+    border: 0;
+    color: var(--color-fg);
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: color 160ms var(--ease-out-expo);
+  }
+  .q:hover {
+    color: var(--color-accent);
+  }
+
+  .q-n {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    color: var(--color-fg-faint);
+    flex: none;
+  }
+  .q-text {
+    flex: 1;
+    font-size: var(--text-base);
+    line-height: 1.35;
+  }
+
+  /* плюс → минус, без bounce */
+  .q-icon {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+  .q-icon span {
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 260ms var(--ease-out-expo);
+  }
+  .q-icon span:last-child {
+    transform: rotate(90deg);
+  }
+  .q[aria-expanded="true"] .q-icon span:last-child {
+    transform: rotate(0deg);
+  }
+
+  .faq-panel p {
+    margin: 0;
+    padding: 0 0 1.5rem 3.1rem;
+    max-width: 62ch;
+    font-size: var(--text-sm);
+    line-height: 1.65;
+    color: var(--color-fg-dim);
+  }
+
+  @media (min-width: 1000px) {
+    .grid {
+      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    }
+  }
+</style>

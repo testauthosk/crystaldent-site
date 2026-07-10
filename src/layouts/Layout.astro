@@ -1,0 +1,123 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru" class="grain">
+  <head>
+    <meta charset="utf-8" />
+    <!-- viewport обязательна: без неё телефон рендерит десктоп-ширину -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0c1a22" />
+    <link rel="icon" href="/brand/mark.svg" type="image/svg+xml" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+
+    <!-- ставим .js до первой отрисовки, чтобы reveal-элементы не мигнули -->
+    <script is:inline>
+      document.documentElement.classList.add("js");
+    </script>
+  </head>
+
+  <body>
+    <div id="preloader" aria-hidden="true">
+      <div class="pre-inner">
+        <div class="pre-mark" id="preMark"></div>
+        <div class="pre-meta">
+          <span class="eyebrow">Viena Dental Clinic</span>
+          <span class="pre-count tnum" id="preCount">0</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="#main" class="skip">К содержимому</a>
+
+    <slot />
+
+    <script>
+      import "../scripts/motion.ts";
+    </script>
+
+    <style>
+      #preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        background: var(--color-ink-950);
+      }
+      html:not(.js) #preloader {
+        display: none;
+      }
+      .pre-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+      }
+      .pre-mark {
+        width: 54px;
+        height: 66px;
+        color: var(--color-fg);
+        /* маска-заливка снизу вверх, ведётся из JS */
+        --fill: 0%;
+        --mark-mask: url("/brand/mark.svg");
+        background: linear-gradient(
+          to top,
+          currentColor 0 var(--fill),
+          color-mix(in oklch, currentColor 14%, transparent) var(--fill) 100%
+        );
+        -webkit-mask: var(--mark-mask) center / contain no-repeat;
+        mask: var(--mark-mask) center / contain no-repeat;
+      }
+      .pre-meta {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+      }
+      .pre-count {
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--color-fg);
+      }
+      .pre-count::after {
+        content: "%";
+        margin-left: 2px;
+        font-size: 0.6em;
+        color: var(--color-fg-faint);
+      }
+
+      .skip {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 200;
+        background: var(--color-accent);
+        color: var(--color-accent-ink);
+        padding: 0.75rem 1.25rem;
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .skip:focus {
+        left: 1rem;
+        top: 1rem;
+      }
+    </style>
+  </body>
+</html>

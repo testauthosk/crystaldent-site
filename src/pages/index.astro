@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/Hero.astro";
+import TriPanels from "../components/TriPanels.astro";
+import Services from "../components/Services.astro";
+import Doctors from "../components/Doctors.astro";
+import Booking from "../components/Booking.astro";
+import Faq from "../components/Faq.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout
+  title="CrystalDent — Viena Dental Clinic"
+  description="Комплексные решения для идеальной улыбки: имплантация, элайнеры, протезирование и профилактика. Онлайн-запись к врачу."
+>
+  <Nav />
+  <main>
+    <Hero />
+    <TriPanels />
+    <Services />
+    <Doctors />
+    <Booking />
+    <Faq />
+  </main>
+  <Footer />
+</Layout>

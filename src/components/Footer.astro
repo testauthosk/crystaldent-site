@@ -1,0 +1,182 @@
+---
+import Logo from "./Logo.astro";
+import { brand, nav, PLACEHOLDER } from "../data/site";
+
+/** Пустые контакты не рендерим — прочерки на витрине выглядят как брак. */
+const has = (v: string) => v && v !== PLACEHOLDER;
+const showContacts = has(brand.phone) || has(brand.email);
+const showAddress = has(brand.address) || has(brand.hours);
+---
+
+<section class="cta" id="contacts">
+  <div class="aura" aria-hidden="true"></div>
+  <div class="wrap cta-wrap">
+    <h2 class="display cta-title reveal">
+      <span class="line-mask"><span class="line-inner">Готовы начать</span></span>
+      <span class="line-mask"><span class="line-inner">лечение?</span></span>
+    </h2>
+    <div class="cta-side reveal">
+      <p class="lede">
+        Запишитесь на консультацию — врач осмотрит, объяснит варианты и составит план без
+        обязательств.
+      </p>
+      <a href="#booking" class="btn btn--paper" data-magnetic>
+        <span class="btn__label">Записаться на приём</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="f-grid">
+      <div class="f-brand">
+        <Logo variant="lockup" />
+        <p class="f-tag">{brand.tagline}</p>
+      </div>
+
+      <nav class="f-nav" aria-label="Подвал">
+        <span class="eyebrow">Разделы</span>
+        {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      </nav>
+
+      {
+        showContacts && (
+          <div class="f-col">
+            <span class="eyebrow">Контакты</span>
+            {has(brand.phone) && <span class="f-val tnum">{brand.phone}</span>}
+            {has(brand.email) && <span class="f-val">{brand.email}</span>}
+          </div>
+        )
+      }
+
+      {
+        showAddress && (
+          <div class="f-col">
+            <span class="eyebrow">Адрес</span>
+            {has(brand.address) && <span class="f-val">{brand.address}</span>}
+            {has(brand.hours) && <span class="f-val tnum">{brand.hours}</span>}
+          </div>
+        )
+      }
+
+      <div class="f-col">
+        <span class="eyebrow">Запись</span>
+        <a href="#booking" class="f-val f-link">Онлайн-запись</a>
+        <a href="#faq" class="f-val f-link">Частые вопросы</a>
+      </div>
+    </div>
+
+    <div class="f-bottom">
+      <span>© <span id="year" class="tnum">2026</span> {brand.name}</span>
+      <span>{brand.tagline}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .wrap {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+  }
+
+  .cta {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4rem, 9vw, 8rem) 0;
+    background: var(--color-ink-900);
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .cta-wrap {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: end;
+  }
+  .cta-title {
+    font-size: clamp(2rem, 6vw, 5.4rem);
+    margin: 0;
+  }
+  .cta-side {
+    display: grid;
+    gap: 1.75rem;
+    justify-items: start;
+  }
+
+  .footer {
+    background: var(--color-ink-950);
+    border-top: 1px solid var(--color-line-soft);
+    padding: clamp(2.5rem, 5vw, 4rem) 0 2rem;
+  }
+
+  .f-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-line-soft);
+  }
+
+  .f-brand {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    color: var(--color-fg);
+  }
+  .f-tag {
+    margin: 0;
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-fg-faint);
+  }
+
+  .f-nav,
+  .f-col {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+  .f-nav a {
+    font-size: var(--text-sm);
+    color: var(--color-fg-dim);
+    transition: color 160ms var(--ease-out-expo);
+    width: fit-content;
+  }
+  .f-nav a:hover {
+    color: var(--color-accent);
+  }
+  .f-val {
+    font-size: var(--text-sm);
+    color: var(--color-fg-dim);
+  }
+  .f-link {
+    width: fit-content;
+    transition: color 160ms var(--ease-out-expo);
+  }
+  .f-link:hover {
+    color: var(--color-accent);
+  }
+
+  .f-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.06em;
+    color: var(--color-fg-faint);
+  }
+
+  @media (min-width: 900px) {
+    .cta-wrap {
+      grid-template-columns: 1.3fr 0.7fr;
+    }
+    .f-grid {
+      grid-template-columns: 1.6fr 1fr 1fr;
+    }
+  }
+</style>

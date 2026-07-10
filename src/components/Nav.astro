@@ -1,0 +1,240 @@
+---
+import Logo from "./Logo.astro";
+import { nav } from "../data/site";
+---
+
+<div id="progress" aria-hidden="true"></div>
+
+<header id="nav">
+  <div class="nav-inner">
+    <a href="#main" class="nav-logo" aria-label="CrystalDent — на главную">
+      <Logo variant="lockup" />
+    </a>
+
+    <nav class="nav-links" aria-label="Основная навигация">
+      {
+        nav.map((item) => (
+          <a href={item.href} class="nav-link">
+            <span>{item.label}</span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="nav-actions">
+      <a href="#booking" class="btn nav-cta" data-magnetic>
+        <span class="btn__label">Записаться</span>
+      </a>
+
+      <button id="menuBtn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Меню">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="menuPanel">
+  <nav aria-label="Мобильная навигация">
+    {
+      nav.map((item, i) => (
+        <a href={item.href} style={`--i:${i}`}>
+          <span class="m-n tnum">0{i + 1}</span>
+          <span class="m-l">{item.label}</span>
+        </a>
+      ))
+    }
+  </nav>
+  <a href="#booking" class="btn btn--paper m-cta"><span class="btn__label">Записаться на приём</span></a>
+</div>
+
+<style>
+  #progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    z-index: 80;
+  }
+
+  #nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 70;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color 260ms var(--ease-out-expo),
+      border-color 260ms var(--ease-out-expo),
+      backdrop-filter 260ms var(--ease-out-expo);
+  }
+  #nav.is-stuck {
+    background: color-mix(in oklch, var(--color-ink-950) 82%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom-color: var(--color-line-soft);
+  }
+
+  .nav-inner {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .nav-logo {
+    color: var(--color-fg);
+    display: inline-flex;
+    transition: opacity 160ms var(--ease-out-expo);
+  }
+  .nav-logo:hover {
+    opacity: 0.72;
+  }
+
+  .nav-links {
+    display: none;
+    gap: 2.25rem;
+  }
+  .nav-link {
+    position: relative;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    color: var(--color-fg-dim);
+    padding: 0.35rem 0;
+    transition: color 160ms var(--ease-out-expo);
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 100%;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 260ms var(--ease-out-expo);
+  }
+  .nav-link:hover {
+    color: var(--color-fg);
+  }
+  .nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .nav-cta {
+    display: none;
+    padding: 0.85rem 1.35rem;
+  }
+
+  #menuBtn {
+    display: grid;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    place-content: center;
+    border: 1px solid var(--color-line);
+    background: transparent;
+    cursor: pointer;
+  }
+  #menuBtn span {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: var(--color-fg);
+    transition: transform 260ms var(--ease-out-expo);
+  }
+  #menuBtn[aria-expanded="true"] span:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+  #menuBtn[aria-expanded="true"] span:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+
+  #menuPanel {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--color-ink-950);
+    padding: calc(var(--nav-h) + 3rem) clamp(1rem, 6vw, 3rem) 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+    clip-path: inset(0 0 100% 0);
+    pointer-events: none;
+    transition: clip-path 520ms var(--ease-out-expo);
+  }
+  #menuPanel.is-open {
+    clip-path: inset(0 0 0 0);
+    pointer-events: auto;
+  }
+  #menuPanel nav {
+    display: flex;
+    flex-direction: column;
+  }
+  #menuPanel nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--color-line-soft);
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 420ms var(--ease-out-expo),
+      transform 420ms var(--ease-out-expo);
+    transition-delay: calc(var(--i) * 60ms + 120ms);
+  }
+  #menuPanel.is-open nav a {
+    opacity: 1;
+    transform: none;
+  }
+  .m-n {
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    color: var(--color-fg-faint);
+  }
+  .m-l {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    letter-spacing: 0.01em;
+  }
+  .m-cta {
+    width: 100%;
+  }
+
+  @media (min-width: 900px) {
+    .nav-links {
+      display: flex;
+    }
+    .nav-cta {
+      display: inline-flex;
+    }
+    #menuBtn {
+      display: none;
+    }
+    #menuPanel {
+      display: none;
+    }
+  }
+</style>

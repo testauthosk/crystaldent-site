@@ -1,0 +1,63 @@
+---
+import markSvg from "../brand/mark.svg?raw";
+import wordmarkSvg from "../brand/wordmark.svg?raw";
+
+interface Props {
+  variant?: "lockup" | "mark" | "wordmark";
+  class?: string;
+  markClass?: string;
+}
+
+const { variant = "lockup", class: className = "", markClass = "" } = Astro.props;
+---
+
+{
+  variant === "mark" && (
+    <span class={`logo-svg logo-mark ${className}`} set:html={markSvg} aria-hidden="true" />
+  )
+}
+
+{
+  variant === "wordmark" && (
+    <span class={`logo-svg logo-word ${className}`} set:html={wordmarkSvg} aria-hidden="true" />
+  )
+}
+
+{
+  variant === "lockup" && (
+    <span class={`inline-flex items-center gap-3 ${className}`}>
+      <span class={`logo-svg logo-mark ${markClass}`} set:html={markSvg} aria-hidden="true" />
+      <span class="logo-svg logo-word" set:html={wordmarkSvg} aria-hidden="true" />
+      <span class="sr-only">CrystalDent — Viena Dental Clinic</span>
+    </span>
+  )
+}
+
+<style>
+  .logo-svg {
+    display: inline-block;
+    color: currentColor;
+  }
+  .logo-svg :global(svg) {
+    display: block;
+    height: 100%;
+    width: auto;
+  }
+  .logo-mark {
+    height: 30px;
+  }
+  .logo-word {
+    height: 19px;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

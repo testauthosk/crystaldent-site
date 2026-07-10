@@ -1,0 +1,160 @@
+---
+import ToothSpin from "./ToothSpin.astro";
+import ImplantDiagram from "./ImplantDiagram.astro";
+import { panels } from "../data/site";
+
+const arrow = `<svg viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" stroke-width="1.4"/></svg>`;
+---
+
+<section class="tri">
+  <!-- левая: элайнеры -->
+  <article class="panel group reveal">
+    <a href={panels.left.href} class="panel-head">
+      <h2 class="panel-title">
+        {panels.left.title.map((l) => <span>{l}</span>)}
+      </h2>
+      <span class="arrow-box" set:html={arrow} />
+    </a>
+    <p class="panel-text">{panels.left.text}</p>
+    <ToothSpin />
+  </article>
+
+  <!-- центр: врач -->
+  <article class="panel panel--center reveal">
+    <div class="frame">
+      <img
+        src="/img/doctor-main.webp"
+        alt="Врач стоматологической клиники CrystalDent"
+        width="860"
+        height="1160"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        data-parallax="6"
+      />
+      <span class="frame-veil" aria-hidden="true"></span>
+    </div>
+
+    <div class="panel-overlay">
+      <h2 class="panel-title panel-title--lg">
+        {panels.center.title.map((l) => <span>{l}</span>)}
+      </h2>
+      <a href={panels.center.href} class="btn btn--paper" data-magnetic>
+        <span class="btn__label">{panels.center.cta}</span>
+      </a>
+    </div>
+  </article>
+
+  <!-- правая: протезирование -->
+  <article class="panel group reveal">
+    <a href={panels.right.href} class="panel-head">
+      <h2 class="panel-title">
+        {panels.right.title.map((l) => <span>{l}</span>)}
+      </h2>
+      <span class="arrow-box" set:html={arrow} />
+    </a>
+    <p class="panel-text">{panels.right.text}</p>
+    <ImplantDiagram />
+  </article>
+</section>
+
+<style>
+  .tri {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--color-line-soft);
+    border-bottom: 1px solid var(--color-line-soft);
+  }
+
+  .panel {
+    position: relative;
+    background: var(--color-ink-900);
+    padding: clamp(1.5rem, 2.6vw, 2.25rem);
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .panel-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(1.05rem, 1.35vw, 1.32rem);
+    line-height: 1.14;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .panel-title span {
+    display: block;
+  }
+  .panel-title--lg {
+    font-size: clamp(1.25rem, 1.9vw, 1.75rem);
+  }
+
+  .panel-text {
+    margin: 0.9rem 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-fg-dim);
+    max-width: 30ch;
+  }
+
+  /* ── центр: кадр-плейсхолдер под фото ── */
+  .panel--center {
+    padding: 0;
+    overflow: hidden;
+    background: var(--color-ink-850);
+    min-height: 480px;
+  }
+
+  .frame {
+    position: absolute;
+    inset: -7% 0;
+    overflow: hidden;
+    background: var(--color-ink-800);
+  }
+  .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 24%;
+    will-change: transform;
+  }
+  /* подсветка кадра в палитру: бирюза сверху, тёплый низ — как в референсе */
+  .frame-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 70% at 50% 0%, color-mix(in oklch, var(--color-accent-strong) 24%, transparent), transparent 62%),
+      radial-gradient(90% 60% at 70% 100%, color-mix(in oklch, var(--color-warm) 26%, transparent), transparent 64%);
+    mix-blend-mode: soft-light;
+  }
+
+  .panel-overlay {
+    position: relative;
+    margin-top: auto;
+    padding: clamp(1.5rem, 2.6vw, 2.25rem);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    background: linear-gradient(to top, var(--color-ink-950) 12%, transparent);
+  }
+
+  @media (min-width: 900px) {
+    .tri {
+      grid-template-columns: 1fr 1.08fr 1fr;
+    }
+    .panel,
+    .panel--center {
+      min-height: 560px;
+    }
+  }
+</style>

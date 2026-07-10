@@ -1,0 +1,304 @@
+---
+import { slots, bookingSteps, services } from "../data/site";
+---
+
+<section class="sec" id="booking">
+  <div class="aura" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="grid">
+      <header class="b-head">
+        <span class="eyebrow reveal">Онлайн-запись</span>
+        <h2 class="display b-title reveal">Два клика<br />до приёма</h2>
+        <p class="lede reveal">
+          Выберите услугу, удобный день и время. Администратор подтвердит визит и напомнит о нём
+          заранее.
+        </p>
+
+        <ol class="steps reveal">
+          {
+            bookingSteps.map((s) => (
+              <li>
+                <span class="step-n tnum">{s.n}</span>
+                <span class="step-l">{s.label}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </header>
+
+      <div class="panel reveal">
+        <!-- 01 услуга -->
+        <div class="field">
+          <label class="f-label" for="serviceSelect">Услуга</label>
+          <div class="select-wrap">
+            <select id="serviceSelect" class="select">
+              {services.map((s) => <option value={s.title}>{s.title}</option>)}
+              <option value="Консультация">Первичная консультация</option>
+            </select>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.4"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 02 день -->
+        <div class="field">
+          <span class="f-label">Дата</span>
+          <div id="dayStrip" class="day-strip no-bar"></div>
+        </div>
+
+        <!-- 02б время -->
+        <div class="field">
+          <span class="f-label">Время</span>
+          <div id="slotWrap" class="slots">
+            {
+              slots.map((t) => (
+                <button type="button" class="slot tnum" data-slot={t}>
+                  {t}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- итог -->
+        <div class="summary">
+          <div>
+            <span class="f-label">Ваш визит</span>
+            <span id="bookingSummary" class="sum-value tnum" data-state="empty">
+              Выберите дату и время
+            </span>
+          </div>
+          <a href="#contacts" class="btn" data-magnetic>
+            <span class="btn__label">Подтвердить</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    position: relative;
+    padding: clamp(4rem, 9vw, 8.5rem) 0;
+    overflow: hidden;
+  }
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 4vw, 5rem);
+    align-items: start;
+  }
+
+  .b-title {
+    font-size: clamp(1.9rem, 4.4vw, 4rem);
+    margin: 0.9rem 0 1.5rem;
+  }
+
+  .steps {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--color-line-soft);
+    border: 1px solid var(--color-line-soft);
+  }
+  .steps li {
+    flex: 1 1 120px;
+    background: var(--color-ink-900);
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .step-n {
+    font-family: var(--font-display);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+  }
+  .step-l {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-fg-dim);
+  }
+
+  /* ── панель ── */
+  .panel {
+    background: var(--color-ink-850);
+    border: 1px solid var(--color-line-soft);
+    padding: clamp(1.25rem, 2.2vw, 2rem);
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .f-label {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-fg-faint);
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+  .select {
+    appearance: none;
+    width: 100%;
+    background: var(--color-ink-900);
+    border: 1px solid var(--color-line);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    padding: 1rem 3rem 1rem 1.1rem;
+    cursor: pointer;
+  }
+  .select-wrap svg {
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    pointer-events: none;
+    color: var(--color-fg-faint);
+  }
+
+  /* ── лента дней ── */
+  .day-strip {
+    display: flex;
+    gap: 1px;
+    overflow-x: auto;
+    background: var(--color-line-soft);
+    border: 1px solid var(--color-line-soft);
+    scroll-snap-type: x mandatory;
+  }
+  .day-strip :global(.day) {
+    flex: 0 0 auto;
+    width: 66px;
+    padding: 0.9rem 0;
+    display: grid;
+    gap: 0.3rem;
+    justify-items: center;
+    background: var(--color-ink-900);
+    border: 0;
+    color: var(--color-fg-dim);
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition:
+      background 180ms var(--ease-out-expo),
+      color 180ms var(--ease-out-expo);
+  }
+  .day-strip :global(.day:hover:not(:disabled)) {
+    background: var(--color-ink-800);
+    color: var(--color-fg);
+  }
+  .day-strip :global(.day:disabled) {
+    color: var(--color-ink-600);
+    cursor: not-allowed;
+  }
+  .day-strip :global(.day.is-active) {
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .day-strip :global(.day__wd) {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.75;
+  }
+  .day-strip :global(.day__n) {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+
+  /* ── слоты ── */
+  .slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .slot {
+    padding: 0.75rem 1.05rem;
+    background: var(--color-ink-900);
+    border: 1px solid var(--color-line);
+    color: var(--color-fg-dim);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition:
+      background 160ms var(--ease-out-expo),
+      color 160ms var(--ease-out-expo),
+      border-color 160ms var(--ease-out-expo);
+  }
+  .slot:hover {
+    color: var(--color-fg);
+    border-color: var(--color-fg-faint);
+  }
+  .slot.is-active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  /* ── итог ── */
+  .summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .summary > div {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .sum-value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--color-fg-faint);
+  }
+  .sum-value[data-state="partial"] {
+    color: var(--color-fg-dim);
+  }
+  .sum-value[data-state="filled"] {
+    color: var(--color-fg);
+  }
+
+  .note {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: var(--color-fg-faint);
+    letter-spacing: 0.05em;
+  }
+
+  @media (min-width: 1000px) {
+    .grid {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    }
+  }
+</style>
