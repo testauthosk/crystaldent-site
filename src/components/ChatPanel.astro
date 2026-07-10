@@ -18,11 +18,8 @@
         <p class="cp-title" id="chatTitle">Онлайн-чат</p>
         <span class="cp-status"><i aria-hidden="true"></i>Администратор на связи</span>
       </div>
-      <button type="button" id="chatClose" aria-label="Закрыть чат">
-        <svg viewBox="0 0 16 16" fill="none">
-          <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-        </svg>
-      </button>
+      <!-- крестика здесь нет: закрывает сама кнопка чата, которая
+           превращается в крестик на своём же месте -->
     </header>
 
     <div class="cp-msgs" id="chatMsgs">
@@ -61,27 +58,31 @@
     pointer-events: auto;
   }
 
-  /* стартовый размер равен кнопке чата: панель буквально вырастает из неё */
+  /* стартовый размер равен кнопке чата: панель буквально вырастает из неё,
+     из того же нижнего левого угла */
   #chatPanel {
     --w: min(420px, 94vw);
     --h: min(620px, 78vh);
+    --fab: 56px;
+    box-sizing: border-box;
     position: fixed;
     left: 0;
-    bottom: clamp(1.25rem, 4vh, 2.25rem);
+    bottom: 0;
     z-index: 80;
-    width: 54px;
-    height: 54px;
+    width: var(--fab);
+    height: var(--fab);
     background: var(--color-ink-950);
     border: 1px solid var(--color-line);
     border-left: 0;
+    border-bottom: 0;
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    /* закрытие: сначала падает высота, потом уходит ширина */
+    /* закрытие: сначала падает высота, потом уходит ширина — реверс открытия */
     transition:
-      width 420ms cubic-bezier(0.4, 0, 0.2, 1) 460ms,
-      height 460ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-      opacity 200ms linear 880ms;
+      width 520ms cubic-bezier(0.32, 0, 0.15, 1) 540ms,
+      height 540ms cubic-bezier(0.32, 0, 0.15, 1) 0ms,
+      opacity 220ms linear 1040ms;
   }
   #chatPanel.is-open {
     width: var(--w);
@@ -90,9 +91,9 @@
     pointer-events: auto;
     /* открытие: сначала растёт ширина, потом высота */
     transition:
-      width 420ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-      height 460ms cubic-bezier(0.4, 0, 0.2, 1) 420ms,
-      opacity 160ms linear;
+      width 520ms cubic-bezier(0.32, 0, 0.15, 1) 0ms,
+      height 540ms cubic-bezier(0.32, 0, 0.15, 1) 500ms,
+      opacity 180ms linear;
   }
 
   /* Контент зафиксирован в размере открытой панели и прижат к левому нижнему
@@ -110,7 +111,7 @@
   }
   #chatPanel.is-open .cp-in {
     opacity: 1;
-    transition-delay: 820ms;
+    transition-delay: 980ms;
   }
 
   .cp-head {
@@ -193,11 +194,12 @@
     color: var(--color-accent-ink);
   }
 
+  /* слева внизу сидит сама кнопка-крестик — освобождаем ей место */
   .cp-row {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.85rem 1rem;
+    padding: 0.85rem 1rem 0.85rem calc(var(--fab) + 0.75rem);
     border-top: 1px solid var(--color-line-soft);
   }
   .cp-input {
@@ -253,10 +255,9 @@
 
   @media (max-width: 480px) {
     #chatPanel {
-      --w: 94vw;
-      --h: 76vh;
-      width: 48px;
-      height: 48px;
+      --w: 100vw;
+      --h: 78vh;
+      --fab: 50px;
     }
   }
 
