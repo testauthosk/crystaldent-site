@@ -10,6 +10,8 @@ gsap.registerPlugin(ScrollTrigger);
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const finePointer = window.matchMedia("(pointer: fine)").matches;
 
+let lenisInstance: Lenis | null = null;
+
 /* ── Инерционный скролл ─────────────────────────────────── */
 function initLenis() {
   if (reduced) return null;
@@ -38,7 +40,71 @@ function initLenis() {
     });
   });
 
+  lenisInstance = lenis;
   return lenis;
+}
+
+/* ── Плавающие кнопки у краёв окна ──────────────────────── */
+function initFloating() {
+  const chat = document.getElementById("fabChat");
+  const stack = document.getElementById("fabStack");
+  const top = document.getElementById("fabTop");
+  const call = stack?.querySelector<HTMLElement>(".fab-call");
+  if (!chat || !stack || !top || !call) return;
+
+  // «Наверх» выезжает снизу и приподнимает кнопку звонка
+  const size = () => call.offsetHeight;
+  let shown = false;
+
+  const toggleTop = (show: boolean) => {
+    if (show === shown) return;
+    shown = show;
+    stack.classList.toggle("is-up", show);
+    top.tabIndex = show ? 0 : -1;
+
+    if (reduced) {
+      top.style.height = show ? `${size()}px` : "0px";
+      top.style.opacity = show ? "1" : "0";
+      return;
+    }
+    gsap.to(top, {
+      height: show ? size() : 0,
+      opacity: show ? 1 : 0,
+      duration: show ? 0.5 : 0.35,
+      ease: show ? "expo.out" : "power2.in",
+      overwrite: "auto",
+    });
+  };
+
+  // Прямой слушатель, а не ScrollTrigger без триггер-элемента: с Lenis такой
+  // триггер не всегда переключается на мобильных.
+  const onScroll = () => toggleTop(window.scrollY > window.innerHeight * 0.8);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  top.addEventListener("click", () => {
+    if (lenisInstance) lenisInstance.scrollTo(0, { duration: 1.1 });
+    else window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  });
+
+  // лёгкая пульсация рамкой — квадрат расходится и гаснет
+  if (!reduced) {
+    const pulse = chat.querySelector(".pulse");
+    if (pulse) {
+      gsap.fromTo(
+        pulse,
+        { scale: 1, opacity: 0.55 },
+        {
+          scale: 1.45,
+          opacity: 0,
+          duration: 1.6,
+          ease: "power2.out",
+          repeat: -1,
+          repeatDelay: 1.1,
+        },
+      );
+    }
+  }
 }
 
 /* ── Прелоадер: 3D-волна плиток из четырёх углов к центру ── */
@@ -464,6 +530,7 @@ function boot() {
   initServicePreview();
   initMagnetic();
   initNav();
+  initFloating();
   initWordmarkGlow();
   initProgress();
 

@@ -1,0 +1,133 @@
+---
+/**
+ * Плавающие кнопки, прижатые к краям окна.
+ * Слева — чат (слегка пульсирует). Справа — звонок, а под ним снизу
+ * выдвигается стрелка «наверх» и приподнимает звонок.
+ */
+---
+
+<!-- левый край: чат -->
+<button type="button" class="fab fab-chat" id="fabChat" aria-label="Написать в чат">
+  <span class="pulse" aria-hidden="true"></span>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M4 5.5h16v11H9.5L5.5 20v-3.5H4z"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linejoin="round"></path>
+    <path d="M8 10h8M8 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+  </svg>
+</button>
+
+<!-- правый край: звонок + выдвижная стрелка -->
+<div class="fab-stack" id="fabStack">
+  <a href="#booking" class="fab fab-call" aria-label="Позвонить в клинику">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M6.5 4h3l1.5 4-2 1.2a11 11 0 0 0 5.8 5.8L16 13l4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4z"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+
+  <button type="button" class="fab fab-top" id="fabTop" aria-label="Наверх" tabindex="-1">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </button>
+</div>
+
+<style>
+  .fab {
+    display: grid;
+    place-items: center;
+    width: var(--fab, 54px);
+    height: var(--fab, 54px);
+    background: var(--color-ink-950);
+    border: 1px solid var(--color-line);
+    color: var(--color-fg-dim);
+    cursor: pointer;
+    transition:
+      background 200ms var(--ease-out-expo),
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo);
+  }
+  .fab svg {
+    width: 21px;
+    height: 21px;
+  }
+  .fab:hover {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  /* прижаты к самым краям окна */
+  .fab-chat {
+    position: fixed;
+    left: 0;
+    bottom: clamp(1.25rem, 4vh, 2.25rem);
+    z-index: 60;
+    border-left: 0;
+  }
+
+  .fab-stack {
+    position: fixed;
+    right: 0;
+    bottom: clamp(1.25rem, 4vh, 2.25rem);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+  }
+  .fab-stack .fab {
+    border-right: 0;
+  }
+  /* стрелка лежит под звонком: вырастая, приподнимает его */
+  .fab-top {
+    height: 0;
+    border-top: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fab-stack.is-up .fab-top {
+    pointer-events: auto;
+  }
+
+  /* лёгкая пульсация рамкой — без свечения и градиентов */
+  .pulse {
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--color-accent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .fab-chat {
+    position: fixed;
+  }
+  .fab-chat > .pulse {
+    position: absolute;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse {
+      display: none;
+    }
+    .fab-top {
+      height: 54px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .fab {
+      --fab: 48px;
+    }
+    .fab svg {
+      width: 19px;
+      height: 19px;
+    }
+  }
+</style>

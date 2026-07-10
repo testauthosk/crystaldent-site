@@ -57,10 +57,14 @@ const has = (v: string) => v && v !== PLACEHOLDER;
       </div>
     </div>
 
-    <!-- Подпись во всю ширину. Засвечивается по мере доскролла до самого низа. -->
+    <!-- Подпись во всю ширину. Засвечивается по мере доскролла до самого низа.
+         filter и clip-path разнесены по разным слоям: иначе clip-path режет
+         ореол свечения и вокруг надписи появляется прямоугольная кромка. -->
     <div class="f-wordmark" id="fWordmark" aria-hidden="true">
       <span class="f-word-base"><Logo variant="wordmark" /></span>
-      <span class="f-word-lit" id="fWordLit"><Logo variant="wordmark" /></span>
+      <span class="f-word-glow">
+        <span class="f-word-lit" id="fWordLit"><Logo variant="wordmark" /></span>
+      </span>
     </div>
 
     <div class="f-bottom">
@@ -147,13 +151,18 @@ const has = (v: string) => v && v !== PLACEHOLDER;
   .footer {
     background: var(--color-ink-950);
     border-top: 1px solid var(--color-line-soft);
-    padding: clamp(2rem, 4vw, 3.25rem) 0 1.25rem;
+    /* снизу воздух под плавающие кнопки: справа их две, стопкой ~112px */
+    padding: clamp(2rem, 4vw, 3.25rem) 0 8.75rem;
   }
 
+  /* колонки живут в общей сетке с 1px разделителями — та же пластика,
+     что у панелей и услуг. Иначе «столбы» висят в воздухе вразнобой. */
   .f-top {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.75rem 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--color-line-soft);
+    border: 1px solid var(--color-line-soft);
   }
 
   .f-col {
@@ -161,12 +170,19 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     gap: 0.5rem;
     align-content: start;
     min-width: 0;
+    background: var(--color-ink-950);
+    padding: clamp(1.1rem, 2vw, 1.6rem);
   }
   .f-brand {
     grid-column: 1 / -1;
-    gap: 0.75rem;
+    gap: 1rem;
     justify-items: start;
     color: var(--color-fg);
+  }
+  /* на две колонки приходится три группы — последняя занимает ряд целиком,
+     иначе в сетке зияет пустая ячейка */
+  .f-top > .f-col:last-child {
+    grid-column: 1 / -1;
   }
   .f-tag {
     margin: 0;
@@ -225,17 +241,23 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     display: block;
     color: var(--color-ink-700);
   }
-  /* светящийся слой поверх: открывается слева направо по мере доскролла */
-  .f-word-lit {
+  /* внешний слой держит свечение, внутренний — маску заливки */
+  .f-word-glow {
     position: absolute;
     inset: 0;
     display: block;
+    transition: filter 420ms var(--ease-out-expo);
+  }
+  .f-wordmark.is-lit .f-word-glow {
+    filter:
+      drop-shadow(0 0 10px color-mix(in oklch, var(--color-paper) 55%, transparent))
+      drop-shadow(0 0 34px color-mix(in oklch, var(--color-paper) 30%, transparent));
+  }
+  .f-word-lit {
+    display: block;
     color: var(--color-paper);
     clip-path: inset(0 100% 0 0);
-    will-change: clip-path, filter;
-  }
-  .f-wordmark.is-lit .f-word-lit {
-    filter: drop-shadow(0 0 26px color-mix(in oklch, var(--color-paper) 45%, transparent));
+    will-change: clip-path;
   }
 
   /* перебиваем фиксированную высоту из Logo.astro */
@@ -255,24 +277,36 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     justify-content: space-between;
     gap: 1rem;
     padding-top: 1.5rem;
+    /* правый край освобождён под стопку плавающих кнопок */
+    padding-right: 68px;
     border-top: 1px solid var(--color-line-soft);
     font-size: var(--text-2xs);
     letter-spacing: 0.06em;
     color: var(--color-fg-faint);
   }
+  @media (max-width: 719px) {
+    .f-bottom {
+      padding-right: 0;
+    }
+  }
 
   @media (min-width: 720px) {
     .f-top {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    .f-brand {
+    .f-top > .f-col:last-child {
       grid-column: auto;
     }
   }
   @media (min-width: 1080px) {
     .f-top {
-      grid-template-columns: 1.6fr 1fr 1fr 1fr;
-      gap: 2.5rem;
+      grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr));
+    }
+    .f-brand {
+      grid-column: auto;
+    }
+    .footer {
+      padding-bottom: 6rem;
     }
   }
 </style>
