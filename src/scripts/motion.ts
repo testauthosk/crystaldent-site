@@ -60,27 +60,17 @@ function runPreloader(onDone: () => void) {
 
   document.body.style.overflow = "hidden";
 
-  // Крупный квадрат на десктопе, мелкий на мобиле — по ТЗ.
-  const vw = window.innerWidth;
-  const tile = vw >= 1024 ? 68 : vw >= 640 ? 48 : 32;
-  const cols = Math.ceil(vw / tile);
-  const rows = Math.ceil(window.innerHeight / tile);
-
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-
-  const frag = document.createDocumentFragment();
-  for (let i = 0; i < rows * cols; i++) {
-    const d = document.createElement("div");
-    d.className = "tile";
-    frag.appendChild(d);
-  }
-  grid.appendChild(frag);
-  // экран теперь держат сами плитки — страховочный фон убираем,
-  // иначе он останется сплошным после того, как они погаснут
-  pre.style.background = "transparent";
-
+  // Сетку уже построил inline-скрипт в Preloader.astro — забираем размеры оттуда
+  const cols = Number(grid.dataset.cols);
+  const rows = Number(grid.dataset.rows);
   const tiles = grid.children;
+
+  if (!cols || !rows || !tiles.length) {
+    pre.remove();
+    document.body.style.overflow = "";
+    onDone();
+    return;
+  }
 
   // Концентрические кольца, сходящиеся в центр: задержка тем больше, чем ближе
   // плитка к центру, поэтому фронт стартует в углах (они дальше всех) и
@@ -97,11 +87,9 @@ function runPreloader(onDone: () => void) {
     return (1 - Math.min(d / maxDist, 1)) * SPREAD; // 0 в углах, SPREAD в центре
   };
 
-  // Плитки НЕ вращаются. Волна — это подъём к зрителю плюс подсветка гребня;
-  // сверху это читается как рябь на воде. Цвет задаём в hex, чтобы GSAP мог
-  // его интерполировать (oklch он не смешивает).
-  gsap.set(tiles, { backgroundColor: "#080f13", z: 0, transformPerspective: 1200 });
-
+  // Волна без единого градиента: кубик коротко подрастает (это и есть гребень),
+  // затем схлопывается в ноль, обнажая белую подложку. Никаких подсветок и
+  // полупрозрачности — иначе экран читается как «недогрузилось».
   gsap
     .timeline({
       onComplete: () => {
@@ -109,27 +97,25 @@ function runPreloader(onDone: () => void) {
         document.body.style.overflow = "";
       },
     })
-    // знак проявляется поверх сплошной сетки
-    .to(mark, { opacity: 1, scale: 1, duration: 0.75, ease: "expo.out" })
-    // гребень волны бежит к центру, следом плитка гаснет
+    .to(tiles, {
+      keyframes: [
+        { scale: 1.16, duration: 0.2, ease: "power2.out" },
+        { scale: 0, duration: 0.34, ease: "power3.in" },
+      ],
+      stagger: (i) => delayFor(i),
+    })
+    // знак остался один на белом — держим паузу, чтобы его успели увидеть
+    .to(mark, { opacity: 0, scale: 0.9, duration: 0.4, ease: "power2.in" }, "+=0.45")
+    // белая подложка уходит вверх, открывая сайт (под ней тоже белая плита hero)
     .to(
-      tiles,
+      pre,
       {
-        keyframes: [
-          { z: 96, scale: 1.05, backgroundColor: "#1d2b33", duration: 0.3, ease: "sine.out" },
-          { z: 12, scale: 1, backgroundColor: "#0d161b", duration: 0.28, ease: "sine.inOut" },
-          { z: -24, scale: 0.94, opacity: 0, duration: 0.42, ease: "power2.out" },
-        ],
-        stagger: (i) => delayFor(i),
+        clipPath: "inset(0% 0% 100% 0%)",
+        duration: 0.75,
+        ease: "expo.inOut",
+        onStart: onDone,
       },
-      "+=0.2",
-    )
-    // знак остаётся один на открывшемся сайте, затем исчезает.
-    // hero стартует вместе с его уходом — иначе повисает пустая белая плита.
-    .to(
-      mark,
-      { opacity: 0, scale: 1.1, duration: 0.55, ease: "power2.inOut", onStart: onDone },
-      ">-0.2",
+      "-=0.05",
     );
 }
 
