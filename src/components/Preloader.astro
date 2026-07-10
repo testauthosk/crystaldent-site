@@ -1,12 +1,14 @@
 ---
+import markSvg from "../brand/mark.svg?raw";
+
 /**
  * Прелоадер-метафора: чёрные зубы становятся белыми.
  *
- * Старт — чёрный экран (сетка чёрных кубиков на белой подложке).
- * Волна идёт от четырёх углов к центру: фронт вспыхивает белой окантовкой,
- * кубик схлопывается, за ним остаётся белое. Чернота «отбеливается».
- * В центре последним остаётся чёрный знак-зуб — и он тоже отбеливается,
- * снизу вверх, растворяясь в белом. Затем подложка уходит вверх.
+ * Старт — чёрный экран. Волна идёт от четырёх углов к центру: фронт вспыхивает
+ * белой окантовкой, кубик схлопывается, за ним остаётся белое.
+ * Последний островок черноты — знак-зуб. Он отбеливается снизу вверх, но НЕ
+ * растворяется: у белого слоя есть тёмный контур, поэтому зуб остаётся
+ * читаемым. Затем подложка уходит вверх.
  *
  * Никаких градиентов: у кубика два состояния — чёрный и белый.
  */
@@ -14,8 +16,8 @@
 
 <div id="preloader" aria-hidden="true">
   <div class="pre-mark" id="preMark">
-    <span class="mark-dark"></span>
-    <span class="mark-lit" id="preMarkLit"></span>
+    <span class="mark-dark" set:html={markSvg} />
+    <span class="mark-lit" id="preMarkLit" set:html={markSvg} />
   </div>
   <div id="preTiles" class="tiles"></div>
 </div>
@@ -89,17 +91,30 @@
   .pre-mark span {
     position: absolute;
     inset: 0;
-    -webkit-mask: url("/brand/mark.svg") center / contain no-repeat;
-    mask: url("/brand/mark.svg") center / contain no-repeat;
+    display: block;
   }
-  .mark-dark {
-    background: #0b1116;
+  .pre-mark :global(svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
   }
-  /* белый слой поверх: «отбеливание» идёт снизу вверх */
+
+  .mark-dark :global(path) {
+    fill: #0b1116;
+  }
+
+  /* белый слой: «отбеливание» идёт снизу вверх.
+     контур обязателен — без него белый зуб пропадает на белом экране */
   .mark-lit {
-    background: var(--color-paper);
     clip-path: inset(100% 0 0 0);
     will-change: clip-path;
+  }
+  .mark-lit :global(path) {
+    fill: var(--color-paper);
+    stroke: #0b1116;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
   }
 
   @media (prefers-reduced-motion: reduce) {
