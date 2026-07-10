@@ -33,8 +33,19 @@ export function scrollToTop(fallbackSmooth = true) {
   else window.scrollTo({ top: 0, behavior: fallbackSmooth ? "smooth" : "auto" });
 }
 
-/** Блокировка прокрутки: при scroll-lock замок вешается на контейнер. */
+/**
+ * Ссылка на Lenis: на десктопе плавным скроллом управляет он, поэтому
+ * `overflow: hidden` на body его не останавливает — нужно stop()/start().
+ */
+let lenisRef: { stop: () => void; start: () => void } | null = null;
+export function registerLenis(l: { stop: () => void; start: () => void } | null) {
+  lenisRef = l;
+}
+
+/** Блокировка прокрутки: замок на контейнере/боди плюс пауза Lenis. */
 export function lockScroll(on: boolean) {
   if (useRoot) scrollRoot!.classList.toggle("is-locked", on);
   else document.body.style.overflow = on ? "hidden" : "";
+  if (on) lenisRef?.stop();
+  else lenisRef?.start();
 }

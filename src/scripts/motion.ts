@@ -16,6 +16,7 @@ import {
   viewH,
   fullH,
   lockScroll,
+  registerLenis,
 } from "./scroll";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -52,6 +53,7 @@ function initLenis() {
   });
 
   lenisInstance = lenis;
+  registerLenis(lenis);
   return lenis;
 }
 
