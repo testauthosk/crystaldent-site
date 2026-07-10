@@ -1,9 +1,20 @@
 ---
 import { hero } from "../data/site";
+
+/** Направления клиники — общестоматологические, не выдумка о конкретной. */
+const directions = ["Имплантация", "Ортодонтия", "Протезирование", "Профилактика"];
 ---
 
 <section class="hero" id="main">
   <div class="hero-plate">
+    <!-- верхняя строка держит плиту: без неё заголовок висел в пустоте -->
+    <div class="hero-top" data-hero-fade>
+      <span class="eyebrow">{hero.eyebrow}</span>
+      <ul class="hero-dirs">
+        {directions.map((d) => <li>{d}</li>)}
+      </ul>
+    </div>
+
     <div class="hero-grid">
       <h1 class="display hero-title">
         {
@@ -33,6 +44,15 @@ import { hero } from "../data/site";
     </div>
 
     <div class="hero-rule" data-hero-rule aria-hidden="true"></div>
+
+    <!-- подвал плиты: подсказка прокрутки слева, подпись клиники справа -->
+    <div class="hero-foot" data-hero-fade>
+      <a href="#services" class="hero-scroll">
+        <span class="hero-scroll-line" aria-hidden="true"></span>
+        <span>Листайте вниз</span>
+      </a>
+      <span class="hero-sign">{hero.eyebrow}</span>
+    </div>
   </div>
 </section>
 
@@ -43,25 +63,75 @@ import { hero } from "../data/site";
   }
 
   .hero-plate {
+    /* плита занимает экран целиком: первый кадр перестаёт быть половинчатым */
+    min-height: calc(100svh - var(--nav-h));
+    display: flex;
+    flex-direction: column;
     background: var(--color-paper);
     color: var(--color-ink-900);
-    padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
+    padding: clamp(1.5rem, 3vw, 2.5rem) var(--gutter) clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .hero-top {
+    max-width: var(--maxw);
+    width: 100%;
+    margin: 0 auto clamp(2rem, 5vw, 4.5rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-bottom: clamp(1rem, 2vw, 1.5rem);
+    border-bottom: 1px solid var(--color-line-paper);
+  }
+  .hero-top .eyebrow {
+    color: color-mix(in oklch, var(--color-ink-900) 55%, transparent);
+  }
+
+  .hero-dirs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .hero-dirs li {
+    position: relative;
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: color-mix(in oklch, var(--color-ink-900) 62%, transparent);
+  }
+  .hero-dirs li + li::before {
+    content: "";
+    position: absolute;
+    left: -0.85rem;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    transform: translateY(-50%);
+    background: var(--color-accent-strong);
   }
 
   .hero-grid {
-    max-width: 1600px;
+    flex: 1;
+    max-width: var(--maxw);
+    width: 100%;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr;
     gap: clamp(2rem, 4vw, 3.5rem);
-    align-items: end;
+    /* центрируем: прижатый к низу заголовок оставлял дыру под шапкой */
+    align-content: center;
+    align-items: center;
   }
 
   .hero-title {
     /* typography as architecture: заголовок вместо hero-картинки.
        Unbounded очень широкий, а «КОМПЛЕКСНЫЕ» — длинное слово:
        размер подобран так, чтобы строка не резалась маской. */
-    font-size: clamp(1.7rem, 4.85vw, 4.5rem);
+    font-size: clamp(1.85rem, 5.6vw, 5.5rem);
     letter-spacing: 0;
     margin: 0;
   }
@@ -159,16 +229,94 @@ import { hero } from "../data/site";
   }
 
   .hero-rule {
-    max-width: 1600px;
+    max-width: var(--maxw);
+    width: 100%;
     margin: clamp(1.75rem, 3vw, 2.75rem) auto 0;
     height: 1px;
     background: var(--color-line-paper);
+  }
+
+  /* строка стоит там же, где плавающие кнопки — уводим её из-под них */
+  .hero-foot {
+    max-width: var(--maxw);
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(0.85rem, 1.5vw, 1.25rem) 72px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .hero-scroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: color-mix(in oklch, var(--color-ink-900) 60%, transparent);
+    transition: color 180ms var(--ease-out-expo);
+  }
+  .hero-scroll:hover {
+    color: var(--color-ink-900);
+  }
+  /* короткая линия, «стекающая» вниз — намёк на прокрутку */
+  .hero-scroll-line {
+    position: relative;
+    display: block;
+    width: 1px;
+    height: 26px;
+    background: color-mix(in oklch, var(--color-ink-900) 20%, transparent);
+    overflow: hidden;
+  }
+  .hero-scroll-line::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 40%;
+    background: var(--color-ink-900);
+    animation: heroDrip 2.1s var(--ease-out-expo) infinite;
+  }
+  @keyframes heroDrip {
+    0% {
+      transform: translateY(-100%);
+    }
+    60%,
+    100% {
+      transform: translateY(260%);
+    }
+  }
+
+  .hero-sign {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: color-mix(in oklch, var(--color-ink-900) 40%, transparent);
   }
 
   /* без JS текст виден сразу */
   :global(.js) [data-hero-fade] {
     opacity: 0;
     transform: translateY(14px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll-line::after {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .hero-sign {
+      display: none;
+    }
+    .hero-plate {
+      min-height: auto;
+    }
+    .hero-grid {
+      gap: 2.25rem;
+    }
   }
 
   @media (min-width: 1000px) {

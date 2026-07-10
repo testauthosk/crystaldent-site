@@ -151,8 +151,7 @@ const has = (v: string) => v && v !== PLACEHOLDER;
   .footer {
     background: var(--color-ink-950);
     border-top: 1px solid var(--color-line-soft);
-    /* снизу воздух под плавающие кнопки: справа их две, стопкой ~112px */
-    padding: clamp(2rem, 4vw, 3.25rem) 0 8.75rem;
+    padding: clamp(2rem, 4vw, 3.25rem) 0 1.5rem;
   }
 
   /* колонки живут в общей сетке с 1px разделителями — та же пластика,
@@ -238,9 +237,17 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     margin: clamp(1.75rem, 3.5vw, 3rem) 0 clamp(1rem, 2vw, 1.5rem);
     line-height: 0;
   }
+  /* Базовый слой — контур, а не заливка: пустые буквы «вывески» цепляют глаз
+     сами по себе, а свет потом наливает их изнутри. */
   .f-word-base {
     display: block;
-    color: var(--color-ink-700);
+    color: var(--color-ink-600);
+  }
+  .f-word-base :global(path) {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.1;
+    vector-effect: non-scaling-stroke;
   }
   /* внешний слой держит свечение, внутренний — маску заливки */
   .f-word-glow {
@@ -272,22 +279,26 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     height: auto;
   }
 
+  /* Нижняя строка: вместо гигантского отступа снизу просто уводим текст
+     из-под плавающих кнопок по горизонтали — они прижаты к углам. */
   .f-bottom {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding-top: 1.5rem;
-    /* правый край освобождён под стопку плавающих кнопок */
-    padding-right: 68px;
+    gap: 0.5rem 1.5rem;
+    margin-inline: 72px;
+    padding-top: 1rem;
     border-top: 1px solid var(--color-line-soft);
     font-size: var(--text-2xs);
     letter-spacing: 0.06em;
     color: var(--color-fg-faint);
   }
-  @media (max-width: 719px) {
+  @media (max-width: 560px) {
     .f-bottom {
-      padding-right: 0;
+      margin-inline: 66px;
+      justify-content: center;
+      text-align: center;
     }
   }
 
@@ -305,9 +316,6 @@ const has = (v: string) => v && v !== PLACEHOLDER;
     }
     .f-brand {
       grid-column: auto;
-    }
-    .footer {
-      padding-bottom: 6rem;
     }
   }
 </style>
