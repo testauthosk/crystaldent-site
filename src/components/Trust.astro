@@ -1,0 +1,124 @@
+---
+import { trust } from "../data/site";
+
+/**
+ * «Почему нам доверяют» — про сервис, а не про регалии.
+ * Сознательно не сетка одинаковых иконок-карточек: слева липкий заголовок,
+ * справа список строк с крупными номерами и волосяными разделителями.
+ */
+---
+
+<section class="sec" id="trust">
+  <div class="wrap">
+    <div class="grid">
+      <header class="head">
+        <span class="eyebrow reveal">Сервис</span>
+        <h2 class="display sec-title" data-split>Почему нам доверяют</h2>
+        <p class="lede reveal">
+          Лечение — это не только работа врача. Это ещё и то, как с вами говорят, сколько вы ждёте
+          и что вы понимаете о происходящем.
+        </p>
+      </header>
+
+      <ol class="list">
+        {
+          trust.map((t) => (
+            <li class="row reveal">
+              <span class="row-n tnum">{t.n}</span>
+              <div class="row-body">
+                <h3 class="row-title">{t.title}</h3>
+                <p class="row-text">{t.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding: var(--sec-y) 0;
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2.5rem, 4vw, 5rem);
+    align-items: start;
+  }
+
+  .head {
+    min-width: 0;
+  }
+  .head .eyebrow {
+    margin-bottom: 1.5rem;
+  }
+  /* «ДОВЕРЯЮТ» — длинное слово, в узкой колонке его срезала маска строки */
+  .head .sec-title {
+    font-size: clamp(2rem, 4.1vw, 3.9rem);
+  }
+  .head .lede {
+    margin-top: 1.75rem;
+  }
+
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--color-line-soft);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1.25rem 1.75rem;
+    padding: clamp(1.35rem, 2.2vw, 2rem) 0;
+    border-bottom: 1px solid var(--color-line-soft);
+  }
+
+  .row-n {
+    font-family: var(--font-display);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    padding-top: 0.35rem;
+  }
+
+  .row-title {
+    margin: 0 0 0.55rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(0.95rem, 1.15vw, 1.15rem);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+  }
+  .row-text {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-fg-dim);
+    max-width: 62ch;
+  }
+
+  @media (min-width: 1000px) {
+    .grid {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    }
+    /* заголовок держится в поле зрения, пока читаешь список */
+    .head {
+      position: sticky;
+      top: calc(var(--nav-h) + 3rem);
+    }
+  }
+</style>

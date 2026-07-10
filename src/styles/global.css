@@ -203,16 +203,23 @@ time,
   opacity: 0.2;
 }
 
-/* ── Кнопки: квадратные, 1px, без теней ──────────────────── */
+/* ── Кнопки: квадратные, 1px, без теней ──────────────────────
+   Наведение работает как подчёркивание в шапке: цвет въезжает слева
+   направо, а уходит вправо. Никакого магнита к курсору.
+   ─────────────────────────────────────────────────────────── */
 .btn {
   --btn-bg: var(--color-accent);
   --btn-fg: var(--color-accent-ink);
+  --btn-hover-bg: var(--color-fg);
+  --btn-hover-fg: var(--color-ink-900);
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem 1.6rem;
+  overflow: hidden;
+  isolation: isolate;
   font-size: var(--text-xs);
   font-weight: 500;
   text-transform: uppercase;
@@ -220,35 +227,41 @@ time,
   background: var(--btn-bg);
   color: var(--btn-fg);
   border: 1px solid transparent;
-  transition:
-    background 160ms var(--ease-out-expo),
-    color 160ms var(--ease-out-expo),
-    border-color 160ms var(--ease-out-expo);
-  will-change: transform;
+  transition: color 260ms var(--ease-out-expo);
 }
-.btn:hover {
-  background: var(--color-fg);
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-hover-bg);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 320ms var(--ease-out-expo);
 }
+.btn:hover::before,
+.btn:focus-visible::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+.btn:hover,
+.btn:focus-visible {
+  color: var(--btn-hover-fg);
+}
+
 .btn--ghost {
   --btn-bg: transparent;
   --btn-fg: var(--color-fg);
   border-color: var(--color-line);
 }
-.btn--ghost:hover {
-  background: var(--color-fg);
-  color: var(--color-ink-900);
-  border-color: var(--color-fg);
-}
 .btn--paper {
   --btn-bg: var(--color-paper);
   --btn-fg: var(--color-ink-900);
-}
-.btn--paper:hover {
-  background: var(--color-accent);
+  --btn-hover-bg: var(--color-accent);
+  --btn-hover-fg: var(--color-accent-ink);
 }
 .btn__label {
   display: inline-block;
-  will-change: transform;
 }
 
 /* Квадратная кнопка-стрелка (референс) */

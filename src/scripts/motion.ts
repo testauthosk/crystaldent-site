@@ -438,36 +438,6 @@ function initServicePreview() {
   });
 }
 
-/* ── Magnetic-кнопки ────────────────────────────────────── */
-function initMagnetic() {
-  if (reduced || !finePointer) return;
-
-  document.querySelectorAll<HTMLElement>("[data-magnetic]").forEach((el) => {
-    const label = el.querySelector<HTMLElement>(".btn__label") ?? el;
-    const xTo = gsap.quickTo(el, "x", { duration: 0.5, ease: "expo.out" });
-    const yTo = gsap.quickTo(el, "y", { duration: 0.5, ease: "expo.out" });
-    const lxTo = gsap.quickTo(label, "x", { duration: 0.6, ease: "expo.out" });
-    const lyTo = gsap.quickTo(label, "y", { duration: 0.6, ease: "expo.out" });
-
-    el.addEventListener("pointermove", (e) => {
-      const r = el.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      xTo(dx * 0.28);
-      yTo(dy * 0.4);
-      lxTo(dx * 0.1);
-      lyTo(dy * 0.14);
-    });
-
-    el.addEventListener("pointerleave", () => {
-      xTo(0);
-      yTo(0);
-      lxTo(0);
-      lyTo(0);
-    });
-  });
-}
-
 /* ── Шапка: фон появляется после отрыва от верха ────────── */
 function initNav() {
   const nav = document.getElementById("nav");
@@ -555,7 +525,6 @@ function boot() {
   initSpin();
   initCounters();
   initServicePreview();
-  initMagnetic();
   initNav();
   initFloating();
   initWordmarkGlow();
