@@ -4,11 +4,21 @@ import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import SplitType from "split-type";
 import { initUI } from "./ui";
+import { initChat } from "./chat";
+import {
+  reduced,
+  finePointer,
+  scrollRoot,
+  scrollContent,
+  useRoot,
+  scrollTarget,
+  scrollPos,
+  viewH,
+  fullH,
+  lockScroll,
+} from "./scroll";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const finePointer = window.matchMedia("(pointer: fine)").matches;
 
 let lenisInstance: Lenis | null = null;
 
@@ -22,6 +32,7 @@ function initLenis() {
     smoothWheel: true,
     // на тач-устройствах нативный скролл — трогать momentum нельзя
     syncTouch: false,
+    ...(useRoot ? { wrapper: scrollRoot!, content: scrollContent! } : {}),
   });
 
   lenis.on("scroll", ScrollTrigger.update);
@@ -78,12 +89,14 @@ function initFloating() {
 
   // Прямой слушатель, а не ScrollTrigger без триггер-элемента: с Lenis такой
   // триггер не всегда переключается на мобильных.
-  const onScroll = () => toggleTop(window.scrollY > window.innerHeight * 0.8);
-  window.addEventListener("scroll", onScroll, { passive: true });
+  const onScroll = () => toggleTop(scrollPos() > viewH() * 0.8);
+  scrollTarget.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
   top.addEventListener("click", () => {
-    if (lenisInstance) lenisInstance.scrollTo(0, { duration: 1.1 });
+    // подъём наверх намеренно неспешный — резкий рывок читается дёшево
+    if (lenisInstance) lenisInstance.scrollTo(0, { duration: 2.2 });
+    else if (useRoot) scrollRoot!.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
     else window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   });
 
@@ -124,7 +137,7 @@ function runPreloader(onDone: () => void) {
     return;
   }
 
-  document.body.style.overflow = "hidden";
+  lockScroll(true);
 
   // Сетку уже построил inline-скрипт в Preloader.astro — забираем размеры оттуда
   const cols = Number(grid.dataset.cols);
@@ -133,7 +146,7 @@ function runPreloader(onDone: () => void) {
 
   if (!cols || !rows || !tiles.length) {
     pre.remove();
-    document.body.style.overflow = "";
+    lockScroll(false);
     onDone();
     return;
   }
@@ -162,7 +175,7 @@ function runPreloader(onDone: () => void) {
     .timeline({
       onComplete: () => {
         pre.remove();
-        document.body.style.overflow = "";
+        lockScroll(false);
       },
     })
     .to(tiles, {
@@ -476,9 +489,10 @@ function initWordmarkGlow() {
       scrollTrigger: {
         trigger: wrap,
         start: "top bottom",
-        // конец привязан к низу документа: свет заполняет надпись ровно в тот
-        // момент, когда упёрлись в самый низ страницы
-        endTrigger: document.body,
+        // конец привязан к низу контента: свет заполняет надпись ровно в тот
+        // момент, когда упёрлись в самый низ. При scroll-lock body имеет
+        // высоту вьюпорта, поэтому меряем по реальному контейнеру контента.
+        endTrigger: scrollContent ?? document.body,
         end: "bottom bottom",
         scrub: 0.5,
         invalidateOnRefresh: true,
@@ -487,11 +501,9 @@ function initWordmarkGlow() {
     },
   );
 
-  // На мобильных высота вьюпорта скачет из-за адресной строки, поэтому scrub
-  // может не дотянуть до 100% даже в самом низу. Дожигаем вручную по факту
-  // достижения дна — иначе надпись остаётся наполовину белой.
-  const atBottom = () =>
-    window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+  // Страховка: дожигаем свет по факту достижения дна. Даже со scroll-lock
+  // scrub может не дотянуть progress до единицы из-за округлений.
+  const atBottom = () => viewH() + scrollPos() >= fullH() - 2;
 
   const check = () => {
     if (!atBottom()) return;
@@ -500,7 +512,7 @@ function initWordmarkGlow() {
     wrap.classList.add("is-lit");
   };
 
-  window.addEventListener("scroll", check, { passive: true });
+  scrollTarget.addEventListener("scroll", check, { passive: true });
   window.addEventListener("resize", () => ScrollTrigger.refresh());
 }
 
@@ -517,9 +529,13 @@ function initProgress() {
 
 /* ── Старт ──────────────────────────────────────────────── */
 function boot() {
+  // ScrollTrigger должен смотреть в тот же скроллер, что и Lenis
+  if (useRoot) ScrollTrigger.defaults({ scroller: scrollRoot! });
+
   armHero();
   initLenis();
   initUI();
+  initChat();
   initSplitTitles();
   initImageReveals();
   initReveals();

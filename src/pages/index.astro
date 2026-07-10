@@ -10,6 +10,7 @@ import Booking from "../components/Booking.astro";
 import Faq from "../components/Faq.astro";
 import Footer from "../components/Footer.astro";
 import FloatingActions from "../components/FloatingActions.astro";
+import ChatPanel from "../components/ChatPanel.astro";
 ---
 
 <Layout
@@ -17,15 +18,28 @@ import FloatingActions from "../components/FloatingActions.astro";
   description="Комплексные решения для идеальной улыбки: имплантация, элайнеры, протезирование и профилактика. Онлайн-запись к врачу."
 >
   <Nav />
-  <main>
-    <Hero />
-    <TriPanels />
-    <Services />
-    <Bleed />
-    <Doctors />
-    <Booking />
-    <Faq />
-  </main>
-  <Footer />
+
+  <!--
+    На мобильных body зафиксирован, а страница скроллится внутри #scrollRoot.
+    Тогда мобильный браузер не сворачивает адресную строку, вьюпорт не меняет
+    высоту — и сайт не дёргается при скролле вверх.
+    Фиксированные слои (шапка, прелоадер, кнопки, чат) живут снаружи.
+  -->
+  <div id="scrollRoot">
+    <div id="scrollContent">
+      <main>
+        <Hero />
+        <TriPanels />
+        <Services />
+        <Bleed />
+        <Doctors />
+        <Booking />
+        <Faq />
+      </main>
+      <Footer />
+    </div>
+  </div>
+
   <FloatingActions />
+  <ChatPanel />
 </Layout>

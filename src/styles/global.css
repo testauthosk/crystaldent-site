@@ -355,3 +355,37 @@ time,
 .no-bar::-webkit-scrollbar {
   display: none;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   SCROLL-LOCK на мобильных.
+   Тело страницы приколото, прокрутка живёт внутри #scrollRoot.
+   Пока body зафиксирован, мобильный браузер не прячет и не
+   возвращает адресную строку — вьюпорт не меняет высоту, и сайт
+   перестаёт дёргаться при прокрутке вверх.
+   Тот же приём, что на лендинге PayerPay.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  html {
+    height: 100%;
+    overscroll-behavior-y: none;
+  }
+  body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior-y: none;
+  }
+  #scrollRoot {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+  #scrollRoot.is-locked {
+    overflow: hidden;
+  }
+}

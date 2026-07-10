@@ -1,0 +1,272 @@
+---
+/**
+ * Чат поддержки. Пластика перенесена с лендинга PayerPay:
+ * панель растёт из угла кнопки — сначала В ШИРИНУ при той же высоте,
+ * затем В ВЫСОТУ при той же ширине, и только потом проявляется контент.
+ * Закрытие идёт обратным порядком. Фон за панелью затемняется.
+ *
+ * Отличие от PayerPay: у нас квадраты, нулевые радиусы и наша палитра.
+ */
+---
+
+<div id="chatBackdrop" aria-hidden="true"></div>
+
+<div id="chatPanel" role="dialog" aria-modal="true" aria-labelledby="chatTitle" aria-hidden="true">
+  <div class="cp-in">
+    <header class="cp-head">
+      <div>
+        <p class="cp-title" id="chatTitle">Онлайн-чат</p>
+        <span class="cp-status"><i aria-hidden="true"></i>Администратор на связи</span>
+      </div>
+      <button type="button" id="chatClose" aria-label="Закрыть чат">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div class="cp-msgs" id="chatMsgs">
+      <p class="cp-m">Здравствуйте! Это чат клиники CrystalDent.</p>
+      <p class="cp-m">Опишите вопрос — администратор ответит и поможет подобрать время приёма.</p>
+    </div>
+
+    <form class="cp-row" id="chatForm">
+      <label class="cp-input">
+        <span class="sr-only">Сообщение</span>
+        <input type="text" id="chatInput" placeholder="Ваш вопрос…" autocomplete="off" />
+      </label>
+      <button type="submit" class="cp-send" aria-label="Отправить">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  #chatBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: color-mix(in oklch, var(--color-ink-950) 72%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 460ms var(--ease-out-expo);
+  }
+  #chatBackdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* стартовый размер равен кнопке чата: панель буквально вырастает из неё */
+  #chatPanel {
+    --w: min(420px, 94vw);
+    --h: min(620px, 78vh);
+    position: fixed;
+    left: 0;
+    bottom: clamp(1.25rem, 4vh, 2.25rem);
+    z-index: 80;
+    width: 54px;
+    height: 54px;
+    background: var(--color-ink-950);
+    border: 1px solid var(--color-line);
+    border-left: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    /* закрытие: сначала падает высота, потом уходит ширина */
+    transition:
+      width 420ms cubic-bezier(0.4, 0, 0.2, 1) 460ms,
+      height 460ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+      opacity 200ms linear 880ms;
+  }
+  #chatPanel.is-open {
+    width: var(--w);
+    height: var(--h);
+    opacity: 1;
+    pointer-events: auto;
+    /* открытие: сначала растёт ширина, потом высота */
+    transition:
+      width 420ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+      height 460ms cubic-bezier(0.4, 0, 0.2, 1) 420ms,
+      opacity 160ms linear;
+  }
+
+  /* Контент зафиксирован в размере открытой панели и прижат к левому нижнему
+     углу: панель просто «зашторивает» его, а содержимое не переливается. */
+  .cp-in {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: var(--w);
+    height: var(--h);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out-expo);
+  }
+  #chatPanel.is-open .cp-in {
+    opacity: 1;
+    transition-delay: 820ms;
+  }
+
+  .cp-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.15rem;
+    border-bottom: 1px solid var(--color-line-soft);
+  }
+  .cp-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .cp-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+    font-size: var(--text-2xs);
+    color: var(--color-fg-faint);
+  }
+  .cp-status i {
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent);
+    flex: none;
+  }
+
+  #chatClose {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    background: transparent;
+    border: 1px solid var(--color-line);
+    color: var(--color-fg-dim);
+    cursor: pointer;
+    transition:
+      color 180ms var(--ease-out-expo),
+      border-color 180ms var(--ease-out-expo);
+  }
+  #chatClose svg {
+    width: 15px;
+    height: 15px;
+  }
+  #chatClose:hover {
+    color: var(--color-fg);
+    border-color: var(--color-fg-faint);
+  }
+
+  .cp-msgs {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.15rem;
+  }
+  .cp-m {
+    margin: 0;
+    max-width: 86%;
+    padding: 0.75rem 0.9rem;
+    background: var(--color-ink-850);
+    border: 1px solid var(--color-line-soft);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: var(--color-fg-dim);
+  }
+  .cp-m--own {
+    align-self: flex-end;
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  .cp-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .cp-input {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    background: var(--color-ink-900);
+    border: 1px solid var(--color-line);
+    padding: 0.6rem 0.8rem;
+  }
+  .cp-input input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+  }
+  .cp-input input::placeholder {
+    color: var(--color-fg-faint);
+  }
+  .cp-send {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border: 0;
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    cursor: pointer;
+    transition: background 180ms var(--ease-out-expo);
+  }
+  .cp-send svg {
+    width: 16px;
+    height: 16px;
+  }
+  .cp-send:hover {
+    background: var(--color-fg);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    #chatPanel {
+      --w: 94vw;
+      --h: 76vh;
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #chatPanel,
+    #chatPanel.is-open,
+    .cp-in,
+    #chatBackdrop {
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
+</style>

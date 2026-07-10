@@ -1,7 +1,6 @@
 /** Интерактив: мобильное меню, FAQ-аккордеон, дропдаун услуги, календарь записи. */
 import gsap from "gsap";
-
-const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+import { reduced, lockScroll } from "./scroll";
 
 function initMenu() {
   const btn = document.getElementById("menuBtn");
@@ -11,7 +10,7 @@ function initMenu() {
   const setOpen = (open: boolean) => {
     panel.classList.toggle("is-open", open);
     btn.setAttribute("aria-expanded", String(open));
-    document.body.style.overflow = open ? "hidden" : "";
+    lockScroll(open);
   };
 
   btn.addEventListener("click", () => setOpen(!panel.classList.contains("is-open")));
