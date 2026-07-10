@@ -87,9 +87,11 @@ function runPreloader(onDone: () => void) {
     return (1 - Math.min(d / maxDist, 1)) * SPREAD; // 0 в углах, SPREAD в центре
   };
 
-  // Волна без единого градиента: кубик коротко подрастает (это и есть гребень),
-  // затем схлопывается в ноль, обнажая белую подложку. Никаких подсветок и
-  // полупрозрачности — иначе экран читается как «недогрузилось».
+  const markLit = document.getElementById("preMarkLit");
+
+  // Метафора: чёрные зубы становятся белыми.
+  // Гребень волны — вспышка белой окантовки, следом кубик схлопывается и
+  // обнажает белое. Никаких градиентов: у кубика два состояния, чёрный и белый.
   gsap
     .timeline({
       onComplete: () => {
@@ -99,23 +101,19 @@ function runPreloader(onDone: () => void) {
     })
     .to(tiles, {
       keyframes: [
-        { scale: 1.16, duration: 0.2, ease: "power2.out" },
+        { borderColor: "#f2f6f5", scale: 1.16, duration: 0.18, ease: "power2.out" },
         { scale: 0, duration: 0.34, ease: "power3.in" },
       ],
       stagger: (i) => delayFor(i),
     })
-    // знак остался один на белом — держим паузу, чтобы его успели увидеть
-    .to(mark, { opacity: 0, scale: 0.9, duration: 0.4, ease: "power2.in" }, "+=0.45")
-    // белая подложка уходит вверх, открывая сайт (под ней тоже белая плита hero)
+    // последний островок черноты — знак-зуб. Отбеливаем его снизу вверх:
+    // став белым, он растворяется в белом экране.
+    .to(markLit, { clipPath: "inset(0% 0 0 0)", duration: 0.7, ease: "power2.inOut" }, "+=0.4")
+    // подложка уходит вверх, открывая сайт (под ней тоже белая плита hero)
     .to(
       pre,
-      {
-        clipPath: "inset(0% 0% 100% 0%)",
-        duration: 0.75,
-        ease: "expo.inOut",
-        onStart: onDone,
-      },
-      "-=0.05",
+      { clipPath: "inset(0% 0% 100% 0%)", duration: 0.75, ease: "expo.inOut", onStart: onDone },
+      "+=0.15",
     );
 }
 
@@ -391,6 +389,38 @@ function initNav() {
   });
 }
 
+/* ── Подпись в подвале засвечивается по мере упора в низ ── */
+function initWordmarkGlow() {
+  const wrap = document.getElementById("fWordmark");
+  const lit = document.getElementById("fWordLit");
+  if (!wrap || !lit) return;
+
+  if (reduced) {
+    lit.style.clipPath = "inset(0 0 0 0)";
+    wrap.classList.add("is-lit");
+    return;
+  }
+
+  gsap.fromTo(
+    lit,
+    { clipPath: "inset(0 100% 0 0)" },
+    {
+      clipPath: "inset(0 0% 0 0)",
+      ease: "none",
+      scrollTrigger: {
+        trigger: wrap,
+        start: "top bottom",
+        // конец привязан к низу документа: свет заполняет надпись ровно в тот
+        // момент, когда упёрлись в самый низ страницы
+        endTrigger: document.body,
+        end: "bottom bottom",
+        scrub: 0.5,
+        onUpdate: (self) => wrap.classList.toggle("is-lit", self.progress > 0.98),
+      },
+    },
+  );
+}
+
 /* ── Прогресс-полоса чтения ─────────────────────────────── */
 function initProgress() {
   const bar = document.getElementById("progress");
@@ -417,6 +447,7 @@ function boot() {
   initServicePreview();
   initMagnetic();
   initNav();
+  initWordmarkGlow();
   initProgress();
 
   runPreloader(() => {

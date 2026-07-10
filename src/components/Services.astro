@@ -81,7 +81,7 @@ import { services } from "../data/site";
   .row-link {
     position: relative;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
       "n title arrow"
       ". text text";
@@ -90,6 +90,11 @@ import { services } from "../data/site";
     padding: clamp(1.5rem, 2.6vw, 2.4rem) 0;
     color: var(--color-fg);
     transition: color 200ms var(--ease-out-expo);
+  }
+  /* у grid-элементов min-width:auto = min-content: длинное слово вроде
+     «ПРОФЕССИОНАЛЬНАЯ» раздвигало сетку и рождало горизонтальный скролл */
+  .row-link > * {
+    min-width: 0;
   }
   /* заливка строки при наведении — тянется слева, а не мигает */
   .row-link::before {
@@ -121,9 +126,10 @@ import { services } from "../data/site";
     font-family: var(--font-display);
     font-weight: 700;
     text-transform: uppercase;
-    font-size: clamp(1.25rem, 2.6vw, 2.5rem);
-    line-height: 1;
+    font-size: clamp(1.05rem, 2.6vw, 2.5rem);
+    line-height: 1.02;
     letter-spacing: -0.006em;
+    overflow-wrap: anywhere;
     transition: transform 420ms var(--ease-out-expo);
   }
   .row-link:hover .row-title {

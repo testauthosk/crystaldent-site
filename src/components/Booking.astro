@@ -28,27 +28,67 @@ import { slots, bookingSteps, services } from "../data/site";
       </header>
 
       <div class="panel reveal">
-        <!-- 01 услуга -->
+        <!-- 01 услуга: свой дропдаун, а не системный select -->
         <div class="field">
-          <label class="f-label" for="serviceSelect">Услуга</label>
-          <div class="select-wrap">
-            <select id="serviceSelect" class="select">
-              {services.map((s) => <option value={s.title}>{s.title}</option>)}
-              <option value="Консультация">Первичная консультация</option>
-            </select>
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.4"></path>
-            </svg>
+          <span class="f-label" id="srvLabel">Услуга</span>
+          <div class="sel" id="srvSelect">
+            <button
+              type="button"
+              class="sel-btn"
+              id="srvBtn"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-labelledby="srvLabel srvValue"
+            >
+              <span id="srvValue">{services[0].title}</span>
+              <span class="sel-chev" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none">
+                  <path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.4" />
+                </svg>
+              </span>
+            </button>
+
+            <ul class="sel-list" id="srvList2" role="listbox" tabindex="-1" aria-labelledby="srvLabel">
+              {
+                services.map((s, i) => (
+                  <li role="option" aria-selected={i === 0 ? "true" : "false"} data-value={s.title}>
+                    <span class="sel-n tnum">{s.n}</span>
+                    <span>{s.title}</span>
+                  </li>
+                ))
+              }
+              <li role="option" aria-selected="false" data-value="Первичная консультация">
+                <span class="sel-n tnum">07</span>
+                <span>Первичная консультация</span>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <!-- 02 день -->
+        <!-- 02 дата -->
         <div class="field">
-          <span class="f-label">Дата</span>
-          <div id="dayStrip" class="day-strip no-bar"></div>
+          <div class="cal-head">
+            <span class="f-label">Дата</span>
+            <div class="cal-nav">
+              <span class="cal-month tnum" id="calMonth"></span>
+              <button type="button" id="calPrev" aria-label="Предыдущие дни">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.4"/></svg>
+              </button>
+              <button type="button" id="calNext" aria-label="Следующие дни">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.4"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="day-strip no-bar" id="dayStrip">
+            <div class="day-track" id="dayTrack">
+              <!-- подложка выделения: плавает между числами, а не перескакивает -->
+              <span class="day-ind" id="dayInd" aria-hidden="true"></span>
+            </div>
+          </div>
         </div>
 
-        <!-- 02б время -->
+        <!-- 03 время -->
         <div class="field">
           <span class="f-label">Время</span>
           <div id="slotWrap" class="slots">
@@ -62,7 +102,6 @@ import { slots, bookingSteps, services } from "../data/site";
           </div>
         </div>
 
-        <!-- итог -->
         <div class="summary">
           <div>
             <span class="f-label">Ваш визит</span>
@@ -74,7 +113,6 @@ import { slots, bookingSteps, services } from "../data/site";
             <span class="btn__label">Подтвердить</span>
           </a>
         </div>
-
       </div>
     </div>
   </div>
@@ -96,7 +134,7 @@ import { slots, bookingSteps, services } from "../data/site";
 
   .grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(2.5rem, 4vw, 5rem);
     align-items: start;
   }
@@ -117,6 +155,7 @@ import { slots, bookingSteps, services } from "../data/site";
   }
   .steps li {
     flex: 1 1 120px;
+    min-width: 0;
     background: var(--color-ink-900);
     padding: 1rem 1.15rem;
     display: flex;
@@ -137,18 +176,19 @@ import { slots, bookingSteps, services } from "../data/site";
     color: var(--color-fg-dim);
   }
 
-  /* ── панель ── */
   .panel {
     background: var(--color-ink-850);
     border: 1px solid var(--color-line-soft);
     padding: clamp(1.25rem, 2.2vw, 2rem);
     display: grid;
     gap: 1.75rem;
+    min-width: 0;
   }
 
   .field {
     display: grid;
     gap: 0.75rem;
+    min-width: 0;
   }
   .f-label {
     font-size: var(--text-2xs);
@@ -157,78 +197,209 @@ import { slots, bookingSteps, services } from "../data/site";
     color: var(--color-fg-faint);
   }
 
-  .select-wrap {
+  /* ── свой дропдаун ── */
+  .sel {
     position: relative;
   }
-  .select {
-    appearance: none;
+  .sel-btn {
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     background: var(--color-ink-900);
     border: 1px solid var(--color-line);
     color: var(--color-fg);
     font-family: var(--font-sans);
     font-size: var(--text-sm);
-    padding: 1rem 3rem 1rem 1.1rem;
+    text-align: left;
+    padding: 1rem 1.1rem;
     cursor: pointer;
+    transition: border-color 180ms var(--ease-out-expo);
   }
-  .select-wrap svg {
+  .sel-btn:hover,
+  .sel-btn[aria-expanded="true"] {
+    border-color: var(--color-fg-faint);
+  }
+  .sel-chev {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: var(--color-fg-faint);
+    flex: none;
+  }
+  .sel-chev svg {
+    width: 100%;
+    height: 100%;
+    transition: transform 280ms var(--ease-out-expo);
+  }
+  .sel-btn[aria-expanded="true"] .sel-chev svg {
+    transform: rotate(180deg);
+  }
+
+  .sel-list {
     position: absolute;
-    right: 1.1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 15px;
-    height: 15px;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--color-ink-900);
+    border: 1px solid var(--color-line);
+    max-height: 288px;
+    overflow-y: auto;
+    clip-path: inset(0 0 100% 0);
     pointer-events: none;
+  }
+  .sel-list.is-open {
+    pointer-events: auto;
+  }
+  .sel-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 1.1rem;
+    font-size: var(--text-sm);
+    color: var(--color-fg-dim);
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-line-soft);
+    transition:
+      background 160ms var(--ease-out-expo),
+      color 160ms var(--ease-out-expo);
+  }
+  .sel-list li:last-child {
+    border-bottom: 0;
+  }
+  .sel-list li:hover,
+  .sel-list li.is-active {
+    background: var(--color-ink-850);
+    color: var(--color-fg);
+  }
+  .sel-list li[aria-selected="true"] .sel-n {
+    color: var(--color-accent);
+  }
+  .sel-n {
+    font-family: var(--font-display);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
     color: var(--color-fg-faint);
   }
 
-  /* ── лента дней ── */
-  .day-strip {
+  /* ── календарь ── */
+  .cal-head {
     display: flex;
-    gap: 1px;
-    overflow-x: auto;
-    background: var(--color-line-soft);
-    border: 1px solid var(--color-line-soft);
-    scroll-snap-type: x mandatory;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
-  .day-strip :global(.day) {
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cal-month {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-fg-dim);
+    margin-right: 0.35rem;
+  }
+  .cal-nav button {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: 1px solid var(--color-line);
+    color: var(--color-fg-dim);
+    cursor: pointer;
+    transition:
+      color 160ms var(--ease-out-expo),
+      border-color 160ms var(--ease-out-expo);
+  }
+  .cal-nav button svg {
+    width: 14px;
+    height: 14px;
+  }
+  .cal-nav button:hover {
+    color: var(--color-fg);
+    border-color: var(--color-fg-faint);
+  }
+
+  .day-strip {
+    overflow-x: auto;
+    border: 1px solid var(--color-line-soft);
+    scroll-snap-type: x proximity;
+  }
+  .day-track {
+    position: relative;
+    display: flex;
+    min-width: max-content;
+  }
+
+  /* плавающая подложка выделения */
+  .day-ind {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background: var(--color-accent);
+    z-index: 0;
+    opacity: 0;
+    will-change: transform, width;
+  }
+
+  .day-track :global(.day) {
+    position: relative;
+    z-index: 1;
     flex: 0 0 auto;
-    width: 66px;
+    width: 68px;
     padding: 0.9rem 0;
     display: grid;
     gap: 0.3rem;
     justify-items: center;
-    background: var(--color-ink-900);
+    background: transparent;
     border: 0;
+    border-right: 1px solid var(--color-line-soft);
     color: var(--color-fg-dim);
     cursor: pointer;
     scroll-snap-align: start;
-    transition:
-      background 180ms var(--ease-out-expo),
-      color 180ms var(--ease-out-expo);
+    transition: color 220ms var(--ease-out-expo);
   }
-  .day-strip :global(.day:hover:not(:disabled)) {
-    background: var(--color-ink-800);
+  .day-track :global(.day:hover:not(:disabled):not(.is-active)) {
     color: var(--color-fg);
   }
-  .day-strip :global(.day:disabled) {
+  .day-track :global(.day:disabled) {
     color: var(--color-ink-600);
     cursor: not-allowed;
   }
-  .day-strip :global(.day.is-active) {
-    background: var(--color-accent);
+  .day-track :global(.day.is-active) {
     color: var(--color-accent-ink);
   }
-  .day-strip :global(.day__wd) {
+  .day-track :global(.day__wd) {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     opacity: 0.75;
   }
-  .day-strip :global(.day__n) {
+  .day-track :global(.day__n) {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: var(--text-sm);
+  }
+  /* сегодняшний день помечен точкой */
+  .day-track :global(.day.is-today .day__wd::after) {
+    content: "";
+    display: block;
+    width: 3px;
+    height: 3px;
+    margin: 3px auto 0;
+    background: currentColor;
   }
 
   /* ── слоты ── */
@@ -261,7 +432,6 @@ import { slots, bookingSteps, services } from "../data/site";
     color: var(--color-accent-ink);
   }
 
-  /* ── итог ── */
   .summary {
     display: flex;
     flex-wrap: wrap;
@@ -274,6 +444,7 @@ import { slots, bookingSteps, services } from "../data/site";
   .summary > div {
     display: grid;
     gap: 0.4rem;
+    min-width: 0;
   }
   .sum-value {
     font-family: var(--font-display);
@@ -286,13 +457,6 @@ import { slots, bookingSteps, services } from "../data/site";
   }
   .sum-value[data-state="filled"] {
     color: var(--color-fg);
-  }
-
-  .note {
-    margin: 0;
-    font-size: var(--text-2xs);
-    color: var(--color-fg-faint);
-    letter-spacing: 0.05em;
   }
 
   @media (min-width: 1000px) {

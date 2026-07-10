@@ -1,21 +1,27 @@
 ---
 /**
- * Прелоадер: белая подложка, поверх — сетка чёрных кубиков с белой окантовкой.
- * Волна схлопывает кубики от четырёх углов к центру. Никаких градиентов и
- * подсветок: кубик либо есть, либо его нет.
+ * Прелоадер-метафора: чёрные зубы становятся белыми.
  *
- * Знак лежит ПОД сеткой — по мере очистки центра он проявляется сам, остаётся
- * один на белом, затем исчезает и подложка уходит вверх.
+ * Старт — чёрный экран (сетка чёрных кубиков на белой подложке).
+ * Волна идёт от четырёх углов к центру: фронт вспыхивает белой окантовкой,
+ * кубик схлопывается, за ним остаётся белое. Чернота «отбеливается».
+ * В центре последним остаётся чёрный знак-зуб — и он тоже отбеливается,
+ * снизу вверх, растворяясь в белом. Затем подложка уходит вверх.
+ *
+ * Никаких градиентов: у кубика два состояния — чёрный и белый.
  */
 ---
 
 <div id="preloader" aria-hidden="true">
-  <div id="preMark" class="pre-mark"></div>
+  <div class="pre-mark" id="preMark">
+    <span class="mark-dark"></span>
+    <span class="mark-lit" id="preMarkLit"></span>
+  </div>
   <div id="preTiles" class="tiles"></div>
 </div>
 
 <script is:inline>
-  // Строим сетку синхронно, до первой отрисовки: если ждать модуль motion.ts,
+  // Сетку строим синхронно, до первой отрисовки: если ждать модуль motion.ts,
   // экран успевает моргнуть белым.
   (() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -61,14 +67,16 @@
     display: grid;
   }
 
+  /* в покое экран читается чёрным: окантовка едва темнее заливки.
+     белой она вспыхивает только на гребне волны */
   .tiles :global(.tile) {
     box-sizing: border-box;
     background: #0b1116;
-    border: 1px solid var(--color-paper);
-    will-change: transform;
+    border: 1px solid #16212a;
+    will-change: transform, border-color;
   }
 
-  /* знак под сеткой: остаётся один, когда кубики в центре схлопнутся */
+  /* знак под сеткой: последний островок черноты */
   .pre-mark {
     position: absolute;
     z-index: 0;
@@ -77,10 +85,21 @@
     width: clamp(54px, 7vw, 98px);
     aspect-ratio: 124 / 152;
     transform: translate(-50%, -50%);
-    background: #0b1116;
+  }
+  .pre-mark span {
+    position: absolute;
+    inset: 0;
     -webkit-mask: url("/brand/mark.svg") center / contain no-repeat;
     mask: url("/brand/mark.svg") center / contain no-repeat;
-    will-change: transform, opacity;
+  }
+  .mark-dark {
+    background: #0b1116;
+  }
+  /* белый слой поверх: «отбеливание» идёт снизу вверх */
+  .mark-lit {
+    background: var(--color-paper);
+    clip-path: inset(100% 0 0 0);
+    will-change: clip-path;
   }
 
   @media (prefers-reduced-motion: reduce) {
